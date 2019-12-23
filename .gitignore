@@ -1,0 +1,5 @@
+.DS_Store
+tmp
+ui-dist
+node_modules
+bindata.go
