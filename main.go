@@ -5,15 +5,21 @@ import (
 
 	"database/sql"
 
+	"github.com/k0kubun/pp"
 	"github.com/kataras/golog"
 	"github.com/kataras/iris"
 	_ "github.com/mattn/go-sqlite3"
+	migrate "github.com/rubenv/sql-migrate"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
 // filled by linker
 var appVersion string
 var appHash string
+
+var isProd = appVersion != ""
+var debugDefaultDBPath = "tmp/debug.sqlite3"
+var prodDefaultDBPath = "apphub.sqlite3"
 
 // globals
 var appDB *sql.DB
@@ -25,7 +31,15 @@ var config = struct {
 
 func parseFlags() {
 	kingpin.Flag("port", "Server running port").Short('p').Default("3389").IntVar(&config.Port)
-	kingpin.Flag("db", "Sqlite database path").Short('d').Default("./apphub.sqlite3").StringVar(&config.DBPath)
+
+	dbFlag := kingpin.Flag("db", "Sqlite3 database path")
+	dbFlag.Short('d')
+	dbFlag.StringVar(&config.DBPath)
+	if isProd {
+		dbFlag.Default(prodDefaultDBPath)
+	} else {
+		dbFlag.Default(debugDefaultDBPath)
+	}
 
 	kingpin.Version(fmt.Sprintf("%s(%s)", appVersion, appHash))
 	kingpin.CommandLine.HelpFlag.Short('h')
@@ -36,7 +50,14 @@ func parseFlags() {
 func main() {
 	parseFlags()
 
+	if !isProd {
+		golog.Info("config:")
+		pp.Println(config)
+	}
+
 	initDB()
+
+	migrateDB()
 
 	app := iris.New()
 
@@ -52,8 +73,10 @@ func main() {
 }
 
 func initDB() {
+	dsn := fmt.Sprintf("file:%s?_foreign_keys=true", config.DBPath)
+
 	var err error
-	appDB, err = sql.Open("sqlite3", config.DBPath)
+	appDB, err = sql.Open("sqlite3", dsn)
 
 	if err != nil {
 		golog.Fatalf("could not open sqlite3 database: %v", err)
@@ -145,4 +168,20 @@ func initDB() {
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
+}
+
+func migrateDB() {
+	migrations := &migrate.AssetMigrationSource{
+		Asset:    Asset,
+		AssetDir: AssetDir,
+		Dir:      "migrations",
+	}
+
+	n, err := migrate.Exec(appDB, "sqlite3", migrations, migrate.Up)
+
+	if err != nil {
+		golog.Fatalf("could not mgirate database: %v", err)
+	}
+
+	golog.Infof("applied %d migrations", n)
 }

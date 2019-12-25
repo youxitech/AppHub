@@ -1,5 +1,5 @@
 .DS_Store
 tmp
-ui-dist
+static/ui
 node_modules
 bindata.go

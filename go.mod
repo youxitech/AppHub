@@ -3,7 +3,6 @@ module cjting.me/apphub
 go 1.13
 
 require (
-	github.com/BurntSushi/toml v0.3.1 // indirect
 	github.com/Joker/jade v1.0.0 // indirect
 	github.com/Shopify/goreferrer v0.0.0-20181106222321-ec9c9a553398 // indirect
 	github.com/ajg/form v1.5.1 // indirect
@@ -23,6 +22,7 @@ require (
 	github.com/iris-contrib/httpexpect v0.0.0-20180314041918-ebe99fcebbce // indirect
 	github.com/json-iterator/go v1.1.8 // indirect
 	github.com/k0kubun/colorstring v0.0.0-20150214042306-9440f1994b88 // indirect
+	github.com/k0kubun/pp v3.0.1+incompatible
 	github.com/kataras/golog v0.0.10
 	github.com/kataras/iris v11.1.1+incompatible
 	github.com/klauspost/compress v1.9.4 // indirect
@@ -34,6 +34,7 @@ require (
 	github.com/onsi/ginkgo v1.11.0 // indirect
 	github.com/onsi/gomega v1.8.1 // indirect
 	github.com/rakyll/statik v0.1.6
+	github.com/rubenv/sql-migrate v0.0.0-20191213152630-06338513c237
 	github.com/ryanuber/columnize v2.1.0+incompatible // indirect
 	github.com/sergi/go-diff v1.1.0 // indirect
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect

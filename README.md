@@ -19,19 +19,23 @@ functions:
 - figure out ios package tyep: ad-hoc, appstore, etc...
 - get device count when ad-hoc
 - upload progress
+- android support multiple channel packages
+- download all packages of a version in zip 
 
 pages:
 - index(login)
 - app page(handle no app)
 - upload
-- version preview(pc + mobile)
-- app preview
+- app page: laetst version
+- version page(pc + mobile): list packages
+- package page(pc + mobile): specific package
 
 we have a root data dir
 
 model
+/[id]
 app:
-  - id: string primary key
+  - id: string primary key generated, editable
   - icon: path relative to root data dir
   - name: string
   - type: 'ios' / 'android'
@@ -41,15 +45,24 @@ app:
   - created_at: ts
   - updated_at: ts
 
+/version/[version]
 version:
-  - id: string primary key
+  - version: full generated string primary key unique
   - app_id: app id
   - androidVersionCode
   - androidVersionName
   - iosShortVersion
   - iosBundleVersion
-  - version: full generated string
   - created_at: ts
-  - remark
+  - remark: string
   - download_count
+
+/package/[package_id]
+package:
+  - id: string random generated primary key
+  - version_id: foreign key
+  - download_count
+  - name: extracted from filename, editable, corresponding to filename in disk
   - size: int in bytes
+  - created_at: ts
+  - remark: string

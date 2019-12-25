@@ -1,0 +1,4 @@
+development:
+  dialect: sqlite3
+  datasource: tmp/debug.sqlite3
+  dir: static/migrations
