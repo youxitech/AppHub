@@ -52,6 +52,12 @@ func mounteRoute(app *iris.Application) {
 
 	// api
 	{
-		// r := app.Party("/api")
+		r := app.Party("/api")
+
+		// note: front end needs to handle 413
+		r.Post("/upload", handleUpload)
+
+		// note: front end needs to handle 413
+		r.Delete("/package/{id:string}", handleDeletePackage)
 	}
 }

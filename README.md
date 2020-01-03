@@ -31,6 +31,16 @@ pages:
 - package page(pc + mobile): specific package
 
 we have a root data dir
+- ios
+  - bundle_id
+    - icon.png
+    - version
+      - [id].ipa
+- android
+  - bundle_id
+    - version
+      - name.apk
+    - icon.png
 
 model
 /[id]
@@ -38,8 +48,8 @@ app:
   - id: string primary key generated, editable
   - icon: path relative to root data dir
   - name: string
-  - type: 'ios' / 'android'
-  - bundle id: string
+  - platform: 'ios' / 'android'
+  - bundle id: string unique
   - install_password: string // empty means no password
   - download_count: int
   - created_at: ts
@@ -59,10 +69,10 @@ version:
 
 /package/[package_id]
 package:
-  - id: string random generated primary key
+  - id: md5 of package content
   - version_id: foreign key
   - download_count
-  - name: extracted from filename, editable, corresponding to filename in disk
+  - name: extracted from filename, editable
   - size: int in bytes
   - created_at: ts
   - remark: string

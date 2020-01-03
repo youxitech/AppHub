@@ -2,10 +2,9 @@
 -- +migrate Up
 create table app(
   id text not null primary key,
-  icon text not null,
   name text not null,
-  type text not null check(type = 'ios' or type = 'android'),
-  bundle_id text not null,
+  platform text not null check(platform = 'ios' or platform = 'android'),
+  bundle_id text not null unique,
   install_password text not null default '',
   download_count int not null default 0,
   created_at text not null, -- RFC3339
@@ -13,9 +12,9 @@ create table app(
 );
 
 create table version(
-  version string not null primary key, -- generated version
+  id string not null primary key, -- generated full version string
   app_id text not null references app(id),
-  android_version_code int not null default 0,
+  android_version_code text not null default '',
   android_version_name text not null default '',
   ios_short_version text not null default '',
   ios_bundle_version text not null default '',
@@ -26,7 +25,7 @@ create table version(
 
 create table package(
   id string not null primary key,
-  version_id string not null references version(version),
+  version_id string not null references version(id),
   download_count int not null default 0,
   name string not null unique,
   size int not null,
