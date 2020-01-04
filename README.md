@@ -24,11 +24,11 @@ functions:
 
 pages:
 - index(login)
-- app page(handle no app)
+- app page(handle no app): display latest version
 - upload
-- app page: laetst version
 - version page(pc + mobile): list packages
 - package page(pc + mobile): specific package
+- 404
 
 we have a root data dir
 - ios

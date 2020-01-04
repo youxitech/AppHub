@@ -19,26 +19,24 @@ type DB struct {
 }
 
 type App struct {
-	ID              string    `db:"id"`
-	Name            string    `db:"name"`
-	Platform        string    `db:"platform"`
-	BundleID        string    `db:"bundle_id"`
-	InstallPassword string    `db:"install_password"`
-	DownloadCount   int       `db:"download_count"`
-	CreatedAt       time.Time `db:"created_at"`
-	UpdatedAt       time.Time `db:"updated_at"`
+	ID              string `db:"id" json:"id"`
+	Name            string `db:"name" json:"name"`
+	Platform        string `db:"platform" json:"platform"`
+	BundleID        string `db:"bundle_id" json:"bundleID"`
+	InstallPassword string `db:"install_password" json:"installPassword,omitempty"`
+	DownloadCount   int    `db:"download_count" json:"downloadCount"`
 }
 
 type Version struct {
-	ID                 string    `db:"id"`
-	AppID              string    `db:"app_id"`
-	AndroidVersionCode string    `db:"android_version_code"`
-	AndroidVersionName string    `db:"android_version_name"`
-	IOSShortVersion    string    `db:"ios_short_version"`
-	IOSBundleVersion   string    `db:"ios_bundle_version"`
-	Remark             string    `db:"remark"`
-	DownloadCount      int       `db:"download_count"`
-	CreatedAt          time.Time `db:"created_at"`
+	ID                 string `db:"id" json:"id"`
+	AppID              string `db:"app_id" json:"appID"`
+	AndroidVersionCode string `db:"android_version_code" json:"androidVersionCode"`
+	AndroidVersionName string `db:"android_version_name" json:"androidVersionName"`
+	IOSShortVersion    string `db:"ios_short_version" json:"iosShortVersion"`
+	IOSBundleVersion   string `db:"ios_bundle_version" json:"iosBundleVersion"`
+	SortKey            int64  `db:"sort_key" json:"sortKey"`
+	Remark             string `db:"remark" json:"remark"`
+	DownloadCount      int    `db:"download_count" json:"downloadCount"`
 }
 
 type Package struct {
@@ -61,93 +59,6 @@ func initDB() {
 	}
 
 	db = &DB{sqlDB}
-
-	// sqlStmt := `
-	// create table foo (id integer not null primary key, name text);
-	// delete from foo;
-	// `
-	// _, err = db.Exec(sqlStmt)
-	// if err != nil {
-	// 	log.Printf("%q: %s\n", err, sqlStmt)
-	// 	return
-	// }
-
-	// tx, err := db.Begin()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// stmt, err := tx.Prepare("insert into foo(id, name) values(?, ?)")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// defer stmt.Close()
-	// for i := 0; i < 100; i++ {
-	// 	_, err = stmt.Exec(i, fmt.Sprintf("こんにちわ世界%03d", i))
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
-	// }
-	// tx.Commit()
-
-	// rows, err := db.Query("select id, name from foo")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// defer rows.Close()
-	// for rows.Next() {
-	// 	var id int
-	// 	var name string
-	// 	err = rows.Scan(&id, &name)
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
-	// 	fmt.Println(id, name)
-	// }
-	// err = rows.Err()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// stmt, err = db.Prepare("select name from foo where id = ?")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// defer stmt.Close()
-	// var name string
-	// err = stmt.QueryRow("3").Scan(&name)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// fmt.Println(name)
-
-	// _, err = db.Exec("delete from foo")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// _, err = db.Exec("insert into foo(id, name) values(1, 'foo'), (2, 'bar'), (3, 'baz')")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// rows, err = db.Query("select id, name from foo")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// defer rows.Close()
-	// for rows.Next() {
-	// 	var id int
-	// 	var name stringgjjjg
-	// 	err = rows.Scan(&id, &name)
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
-	// 	fmt.Println(id, name)
-	// }
-	// err = rows.Err()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
 }
 
 // null means no package
@@ -175,8 +86,6 @@ func (db *DB) createPackage(
 			app.Name = info.Name
 			app.Platform = info.Platform
 			app.BundleID = info.BundleID
-			app.CreatedAt = time.Now()
-			app.UpdatedAt = time.Now()
 			if err := db.ensureInsertApp(app); err != nil {
 				return nil, errors.Wrap(err, "could not insert app")
 			}
@@ -195,16 +104,16 @@ func (db *DB) createPackage(
 			version.AndroidVersionCode = info.AndroidVersionCode
 			version.IOSShortVersion = info.IOSShortVersion
 			version.IOSBundleVersion = info.IOSBundleVersion
+			version.SortKey = time.Now().Unix()
 			version.Remark = versionRemark
-			version.CreatedAt = time.Now()
 			if _, err := db.NamedExec(`
 				insert into version(
 					id, app_id, android_version_code, android_version_name,
-					ios_short_version, ios_bundle_version, remark, created_at
+					ios_short_version, ios_bundle_version, sort_key, remark
 				)
 				values(
 					:id, :app_id, :android_version_code, :android_version_name,
-					:ios_short_version, :ios_bundle_version, :remark, :created_at
+					:ios_short_version, :ios_bundle_version, :sort_key, :remark
 				)
 			`, version); err != nil {
 				return nil, errors.Wrap(err, "could not insert version")
@@ -238,10 +147,10 @@ func (db *DB) createPackage(
 func (db *DB) insertApp(app *App) error {
 	_, err := db.NamedExec(`
 		insert into app(
-			id, name, platform, bundle_id, created_at, updated_at
+			id, name, platform, bundle_id
 		)
 		values(
-			:id, :name, :platform, :bundle_id, :created_at, :updated_at
+			:id, :name, :platform, :bundle_id
 		)
 			`, app)
 	return err
@@ -250,7 +159,7 @@ func (db *DB) insertApp(app *App) error {
 // handle app.id unique constraint
 func (db *DB) ensureInsertApp(app *App) error {
 	for {
-		app.ID = randomStr(5)
+		app.ID = randomStr(4)
 
 		err := db.insertApp(app)
 
@@ -269,6 +178,37 @@ func (db *DB) ensureInsertApp(app *App) error {
 func (db *DB) deletePackage(id string) error {
 	_, err := db.Exec("delete from package where id = $1", id)
 	return err
+}
+
+func (db *DB) getApp(id string) *App {
+	app := &App{}
+	err := db.Get(app, "select * from app where id = $1", id)
+	if err == sql.ErrNoRows {
+		return nil
+	}
+	return app
+}
+
+// sort by sort_key desc
+func (db *DB) getAppVersions(appID string) ([]*Version, error) {
+	var versions []*Version
+
+	if err := db.Select(&versions, "select * from version where app_id = $1 order by sort_key desc", appID); err != nil {
+		return nil, err
+	}
+
+	return versions, nil
+}
+
+// sort by created_at desc
+func (db *DB) getVersionPackages(versionID string) ([]*Package, error) {
+	var pkgs []*Package
+
+	if err := db.Select(&pkgs, "select * from package where version_id = $1 order by created_at desc", versionID); err != nil {
+		return nil, err
+	}
+
+	return pkgs, nil
 }
 
 func isAppIDUniqueError(err error) bool {

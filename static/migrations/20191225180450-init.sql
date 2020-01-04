@@ -6,9 +6,7 @@ create table app(
   platform text not null check(platform = 'ios' or platform = 'android'),
   bundle_id text not null unique,
   install_password text not null default '',
-  download_count int not null default 0,
-  created_at text not null, -- RFC3339
-  updated_at text not null -- RFC3339
+  download_count int not null default 0
 );
 
 create table version(
@@ -18,7 +16,7 @@ create table version(
   android_version_name text not null default '',
   ios_short_version text not null default '',
   ios_bundle_version text not null default '',
-  created_at text not null,
+  sort_key int not null,
   remark text not null default '',
   download_count int not null default 0
 );
@@ -29,7 +27,7 @@ create table package(
   download_count int not null default 0,
   name string not null unique,
   size int not null,
-  created_at text not null,
+  created_at datetime not null,
   remark text not null default ''
 );
 

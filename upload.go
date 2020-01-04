@@ -15,7 +15,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-// params:
+// form params:
 //	file:
 //  versionRemark:
 //	packageRemark:
