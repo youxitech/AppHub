@@ -11,3 +11,18 @@ func handleDeletePackage(ctx iris.Context) {
 		panic(err)
 	}
 }
+
+func handleGetPackage(ctx iris.Context) {
+	pkg := db.getPackage(ctx.Params().Get("id"))
+	if pkg == nil {
+		ctx.NotFound()
+		return
+	}
+
+	version := db.getVersion(pkg.VersionID)
+
+	ctx.JSON(iris.Map{
+		"version": version,
+		"package": pkg,
+	})
+}

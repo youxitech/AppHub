@@ -1,5 +1,7 @@
 package main
 
+import "time"
+
 /*----------  Corresponding to Database Views or Tables ----------*/
 type SimpleApp struct {
 	ID            string `db:"id" json:"id"`
@@ -15,7 +17,8 @@ type App struct {
 }
 
 type Version struct {
-	ID                 string `db:"id" json:"id"`
+	ID                 int    `db:"id" json:"id"`
+	Version            string `db:"version" json:"version"`
 	AppID              string `db:"app_id" json:"appID"`
 	AndroidVersionCode string `db:"android_version_code" json:"androidVersionCode"`
 	AndroidVersionName string `db:"android_version_name" json:"androidVersionName"`
@@ -33,18 +36,11 @@ type DetailVersion struct {
 }
 
 type Package struct {
-	ID            string `db:"id" json:"id"`
-	VersionID     string `db:"version_id" json:"versionID"`
-	DownloadCount int    `db:"download_count" json:"downloadCount"`
-	Name          string `db:"name" json:"name"`
-	Size          int64  `db:"size" json:"size"`
-	CreatedAt     MyTime `db:"created_at" json:"createdAt"`
-	Remark        string `db:"remark" json:"remark"`
-}
-
-/*----------  Other  ----------*/
-type AppDetail struct {
-	App      *SimpleApp       `json:"app"`      // exclude `installPassword`
-	Versions []*DetailVersion `json:"versions"` // all versions, first one is the current
-	Packages []*Package       `json:"packages"` // packages of latest version
+	ID            string    `db:"id" json:"id"`
+	VersionID     int       `db:"version_id" json:"versionID"`
+	DownloadCount int       `db:"download_count" json:"downloadCount"`
+	Name          string    `db:"name" json:"name"`
+	Size          int64     `db:"size" json:"size"`
+	CreatedAt     time.Time `db:"created_at" json:"createdAt"`
+	Remark        string    `db:"remark" json:"remark"`
 }

@@ -4,13 +4,16 @@ create table app(
   id text not null primary key,
   name text not null,
   platform text not null check(platform = 'ios' or platform = 'android'),
-  bundle_id text not null unique,
+  bundle_id text not null,
   install_password text not null default '',
-  download_count int not null default 0
+  download_count int not null default 0,
+
+  constraint app_unique unique(bundle_id, platform)
 );
 
 create table version(
-  id string not null primary key, -- generated full version string
+  id integer primary key,
+  version text, -- generated full version string
   app_id text not null references app(id),
   android_version_code text not null default '',
   android_version_name text not null default '',
@@ -23,7 +26,7 @@ create table version(
 
 create table package(
   id string not null primary key,
-  version_id string not null references version(id),
+  version_id int not null references version(id),
   download_count int not null default 0,
   name string not null unique,
   size int not null,

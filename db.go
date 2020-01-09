@@ -49,7 +49,12 @@ func (db *DB) createPackage(
 	// fetch app
 	app := &App{}
 	{
-		err := db.Get(app, `select * from app where bundle_id = $1`, info.BundleID)
+		err := db.Get(
+			app,
+			`select * from app where bundle_id = $1 and platform = $2`,
+			info.BundleID,
+			info.Platform,
+		)
 		if err == sql.ErrNoRows {
 			// create app
 			app.Name = info.Name
@@ -64,10 +69,15 @@ func (db *DB) createPackage(
 	// fetch version
 	version := &Version{}
 	{
-		err := db.Get(version, `select * from version where id = $1`, info.FullVersion())
+		err := db.Get(
+			version,
+			`select * from version where version = $1 and app_id = $2`,
+			info.FullVersion(),
+			app.ID,
+		)
 		if err == sql.ErrNoRows {
 			// create version
-			version.ID = info.FullVersion()
+			version.Version = info.FullVersion()
 			version.AppID = app.ID
 			version.AndroidVersionName = info.AndroidVersionName
 			version.AndroidVersionCode = info.AndroidVersionCode
@@ -75,17 +85,20 @@ func (db *DB) createPackage(
 			version.IOSBundleVersion = info.IOSBundleVersion
 			version.SortKey = time.Now().Unix()
 			version.Remark = versionRemark
-			if _, err := db.NamedExec(`
+			if res, err := db.NamedExec(`
 				insert into version(
-					id, app_id, android_version_code, android_version_name,
+					version, app_id, android_version_code, android_version_name,
 					ios_short_version, ios_bundle_version, sort_key, remark
 				)
 				values(
-					:id, :app_id, :android_version_code, :android_version_name,
+					:version, :app_id, :android_version_code, :android_version_name,
 					:ios_short_version, :ios_bundle_version, :sort_key, :remark
 				)
 			`, version); err != nil {
 				return nil, errors.Wrap(err, "could not insert version")
+			} else {
+				id, _ := res.LastInsertId()
+				version.ID = int(id)
 			}
 		}
 	}
@@ -96,7 +109,7 @@ func (db *DB) createPackage(
 	pkg.VersionID = version.ID
 	pkg.Name = fileName
 	pkg.Size = info.Size
-	pkg.CreatedAt = MyTime(time.Now())
+	pkg.CreatedAt = time.Now()
 	pkg.Remark = pkgRemark
 
 	if _, err := db.NamedExec(`
@@ -187,7 +200,7 @@ func (db *DB) getAppDetailedVersions(appID string) ([]*DetailVersion, error) {
 }
 
 // return null if not exists
-func (db *DB) getVersion(id string) *DetailVersion {
+func (db *DB) getVersion(id int) *DetailVersion {
 	ver := &DetailVersion{}
 	err := db.Get(ver, "select * from detail_version where id = $1", id)
 
@@ -203,7 +216,7 @@ func (db *DB) getVersion(id string) *DetailVersion {
 }
 
 // sort by created_at desc
-func (db *DB) getVersionPackages(versionID string) ([]*Package, error) {
+func (db *DB) getVersionPackages(versionID int) ([]*Package, error) {
 	var pkgs []*Package
 
 	if err := db.Select(&pkgs, "select * from package where version_id = $1 order by created_at desc", versionID); err != nil {
@@ -215,7 +228,8 @@ func (db *DB) getVersionPackages(versionID string) ([]*Package, error) {
 
 func isAppIDUniqueError(err error) bool {
 	if e, ok := err.(sqlite3.Error); ok {
-		if e.ExtendedCode == sqlite3.ErrConstraintUnique &&
+		if (e.ExtendedCode == sqlite3.ErrConstraintUnique ||
+			e.ExtendedCode == sqlite3.ErrConstraintPrimaryKey) &&
 			strings.Contains(err.Error(), "app.id") {
 			return true
 		}

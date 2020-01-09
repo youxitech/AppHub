@@ -10,6 +10,8 @@ import (
 // work around sqlite3 error: can't scan string into time.Time
 type MyTime time.Time
 
+var emptyArray = make([]int, 0)
+
 func (t *MyTime) Scan(v interface{}) error {
 	var vt time.Time
 

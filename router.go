@@ -78,9 +78,11 @@ func mounteRoute(app *iris.Application) {
 
 		r.Post("/login", handleLogin)
 
-		r.Get("/{id:string}", handleGetApp)
+		r.Get("/:id", handleGetApp)
 
 		r.Get("/versions/:id", handleGetVersion)
+
+		r.Get("/packages/:id", handleGetPackage)
 	}
 
 	// need to auth
@@ -92,6 +94,11 @@ func mounteRoute(app *iris.Application) {
 		r.Get("/apps", handleGetApps)
 
 		r.Get("/apps/:id", handleGetApp)
+
+		// id: string
+		r.Patch("/apps/:id", handleSetAppID)
+
+		r.Post("/versions/{id:int}/active", handleSetActiveVersion)
 
 		r.Delete("/package/{id:string}", handleDeletePackage)
 
