@@ -18,41 +18,6 @@ type DB struct {
 	*sqlx.DB
 }
 
-type SimpleApp struct {
-	ID            string `db:"id" json:"id"`
-	Name          string `db:"name" json:"name"`
-	Platform      string `db:"platform" json:"platform"`
-	BundleID      string `db:"bundle_id" json:"bundleID"`
-	DownloadCount int    `db:"download_count" json:"downloadCount"`
-}
-
-type App struct {
-	SimpleApp
-	InstallPassword string `db:"install_password"`
-}
-
-type Version struct {
-	ID                 string `db:"id" json:"id"`
-	AppID              string `db:"app_id" json:"appID"`
-	AndroidVersionCode string `db:"android_version_code" json:"androidVersionCode"`
-	AndroidVersionName string `db:"android_version_name" json:"androidVersionName"`
-	IOSShortVersion    string `db:"ios_short_version" json:"iosShortVersion"`
-	IOSBundleVersion   string `db:"ios_bundle_version" json:"iosBundleVersion"`
-	SortKey            int64  `db:"sort_key" json:"sortKey"`
-	Remark             string `db:"remark" json:"remark"`
-	DownloadCount      int    `db:"download_count" json:"downloadCount"`
-}
-
-type Package struct {
-	ID            string    `db:"id" json:"id"`
-	VersionID     string    `db:"version_id" json:"versionID"`
-	DownloadCount int       `db:"download_count" json:"downloadCount"`
-	Name          string    `db:"name" json:"name"`
-	Size          int64     `db:"size" json:"size"`
-	CreatedAt     time.Time `db:"created_at" json:"createdAt"`
-	Remark        string    `db:"remark" json:"remark"`
-}
-
 func initDB() {
 	dsn := fmt.Sprintf("file:%s?_foreign_keys=true", config.DBPath)
 
@@ -131,7 +96,7 @@ func (db *DB) createPackage(
 	pkg.VersionID = version.ID
 	pkg.Name = fileName
 	pkg.Size = info.Size
-	pkg.CreatedAt = time.Now()
+	pkg.CreatedAt = MyTime(time.Now())
 	pkg.Remark = pkgRemark
 
 	if _, err := db.NamedExec(`
@@ -184,12 +149,18 @@ func (db *DB) deletePackage(id string) error {
 	return err
 }
 
-func (db *DB) getApp(id string) *App {
-	app := &App{}
-	err := db.Get(app, "select * from app where id = $1", id)
-	if err == sql.ErrNoRows {
-		return nil
+func (db *DB) getApp(id string) *SimpleApp {
+	app := &SimpleApp{}
+	err := db.Get(app, "select * from simple_app where id = $1", id)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil
+		} else {
+			panic(err)
+		}
 	}
+
 	return app
 }
 
@@ -197,7 +168,7 @@ func (db *DB) getApp(id string) *App {
 func (db *DB) getApps() ([]*SimpleApp, error) {
 	var apps []*SimpleApp
 
-	if err := db.Select(&apps, "select id, name, platform, bundle_id, download_count from app"); err != nil {
+	if err := db.Select(&apps, "select * from simple_app"); err != nil {
 		return nil, err
 	}
 
@@ -205,14 +176,30 @@ func (db *DB) getApps() ([]*SimpleApp, error) {
 }
 
 // sort by sort_key desc
-func (db *DB) getAppVersions(appID string) ([]*Version, error) {
-	var versions []*Version
+func (db *DB) getAppDetailedVersions(appID string) ([]*DetailVersion, error) {
+	var versions []*DetailVersion
 
-	if err := db.Select(&versions, "select * from version where app_id = $1 order by sort_key desc", appID); err != nil {
+	if err := db.Select(&versions, "select * from detail_version where app_id = $1", appID); err != nil {
 		return nil, err
 	}
 
 	return versions, nil
+}
+
+// return null if not exists
+func (db *DB) getVersion(id string) *DetailVersion {
+	ver := &DetailVersion{}
+	err := db.Get(ver, "select * from detail_version where id = $1", id)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil
+		} else {
+			panic(err)
+		}
+	}
+
+	return ver
 }
 
 // sort by created_at desc

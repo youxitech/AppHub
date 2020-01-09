@@ -40,7 +40,7 @@ func parseFlags() {
 	// port
 	kingpin.
 		Flag("port", "Server running port").
-		Short('p').Default("3389").
+		Short('p').Default("3340").
 		IntVar(&config.Port)
 
 	// db

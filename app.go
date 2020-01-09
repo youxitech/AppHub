@@ -2,13 +2,6 @@ package main
 
 import "github.com/kataras/iris"
 
-type AppDetail struct {
-	App      *App       `json:"app"`      // exclude `installPassword`
-	Current  *Version   `json:"current"`  // latest version
-	Packages []*Package `json:"packages"` // packages of latest version
-	Versions []*Version `json:"versions"` // other versions
-}
-
 // path params:
 //	id: string
 func handleGetApp(ctx iris.Context) {
@@ -22,7 +15,7 @@ func handleGetApp(ctx iris.Context) {
 	res := &AppDetail{}
 	res.App = app
 
-	versions, err := db.getAppVersions(app.ID)
+	versions, err := db.getAppDetailedVersions(app.ID)
 	if err != nil {
 		panic(err)
 	}
@@ -32,10 +25,9 @@ func handleGetApp(ctx iris.Context) {
 		return
 	}
 
-	res.Current = versions[0]
-	res.Versions = versions[1:]
+	res.Versions = versions
 
-	pkgs, err := db.getVersionPackages(res.Current.ID)
+	pkgs, err := db.getVersionPackages(res.Versions[0].ID)
 	if err != nil {
 		panic(err)
 	}

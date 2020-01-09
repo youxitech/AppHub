@@ -31,16 +31,11 @@ pages:
 - 404
 
 we have a root data dir
-- ios
-  - bundle_id
+- ios/android
+  - [bundle_id]
     - icon.png
-    - version
-      - [id].ipa
-- android
-  - bundle_id
-    - version
-      - name.apk
-    - icon.png
+    - [version_id]
+      - [id].ipa/apk
 
 model
 /[id]

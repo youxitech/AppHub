@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"net/http"
+	"os"
 	"path"
 	"strings"
 	"time"
@@ -50,13 +51,36 @@ func mounteRoute(app *iris.Application) {
 		serveFile(ctx, "index.html", _index)
 	})
 
+	// data files
+	app.Get("/data/*", func(ctx iris.Context) {
+		parts := strings.Split(ctx.Path(), "/")
+
+		p := path.Join(append([]string{config.RootDir}, parts[2:]...)...)
+
+		if !fileExists(p) {
+			ctx.StatusCode(404)
+			return
+		}
+
+		file, err := os.Open(p)
+		if err != nil {
+			panic(err)
+		}
+
+		http.ServeContent(ctx.ResponseWriter(), ctx.Request(), path.Base(p), _now, file)
+	})
+
 	r := app.Party("/api")
 
 	// no need to auth
 	{
 		r := r.Party("/")
 
+		r.Post("/login", handleLogin)
+
 		r.Get("/{id:string}", handleGetApp)
+
+		r.Get("/versions/:id", handleGetVersion)
 	}
 
 	// need to auth
@@ -67,9 +91,11 @@ func mounteRoute(app *iris.Application) {
 
 		r.Get("/apps", handleGetApps)
 
-		// note: front end needs to handle 413
-		r.Post("/upload", handleUpload)
+		r.Get("/apps/:id", handleGetApp)
 
 		r.Delete("/package/{id:string}", handleDeletePackage)
+
+		// note: front end needs to handle 413
+		r.Post("/upload", handleUpload)
 	}
 }
