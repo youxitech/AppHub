@@ -1,8 +1,6 @@
 import Vue from "vue"
 import Router from "vue-router"
 
-import App from "app"
-
 import Home from "@/home"
 import NotFound from "@/404"
 
@@ -13,17 +11,7 @@ export default new Router({
   routes: [
     {
       path: "/",
-      component: App,
-      children: [
-        {
-          path: "",
-          redirect: "home",
-        },
-        {
-          path: "/home",
-          component: Home,
-        },
-      ],
+      component: Home,
     },
     {
       path: "*",

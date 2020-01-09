@@ -45,3 +45,13 @@ func maxRequestBodySizeMiddleware(limit int64) context.Handler {
 		ctx.Next()
 	}
 }
+
+// check X-Admin-Token header
+func adminAuth(ctx iris.Context) {
+	if ctx.GetHeader("X-Admin-Token") != config.AdminToken {
+		ctx.StatusCode(401)
+		return
+	}
+
+	ctx.Next()
+}

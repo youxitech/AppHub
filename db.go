@@ -18,13 +18,17 @@ type DB struct {
 	*sqlx.DB
 }
 
+type SimpleApp struct {
+	ID            string `db:"id" json:"id"`
+	Name          string `db:"name" json:"name"`
+	Platform      string `db:"platform" json:"platform"`
+	BundleID      string `db:"bundle_id" json:"bundleID"`
+	DownloadCount int    `db:"download_count" json:"downloadCount"`
+}
+
 type App struct {
-	ID              string `db:"id" json:"id"`
-	Name            string `db:"name" json:"name"`
-	Platform        string `db:"platform" json:"platform"`
-	BundleID        string `db:"bundle_id" json:"bundleID"`
-	InstallPassword string `db:"install_password" json:"installPassword,omitempty"`
-	DownloadCount   int    `db:"download_count" json:"downloadCount"`
+	SimpleApp
+	InstallPassword string `db:"install_password"`
 }
 
 type Version struct {
@@ -187,6 +191,17 @@ func (db *DB) getApp(id string) *App {
 		return nil
 	}
 	return app
+}
+
+// App: id, name
+func (db *DB) getApps() ([]*SimpleApp, error) {
+	var apps []*SimpleApp
+
+	if err := db.Select(&apps, "select id, name, platform, bundle_id, download_count from app"); err != nil {
+		return nil, err
+	}
+
+	return apps, nil
 }
 
 // sort by sort_key desc

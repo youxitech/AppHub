@@ -50,15 +50,26 @@ func mounteRoute(app *iris.Application) {
 		serveFile(ctx, "index.html", _index)
 	})
 
-	// api
+	r := app.Party("/api")
+
+	// no need to auth
 	{
-		r := app.Party("/api")
+		r := r.Party("/")
+
+		r.Get("/{id:string}", handleGetApp)
+	}
+
+	// need to auth
+	{
+		r := r.Party("/admin")
+
+		r.Use(adminAuth)
+
+		r.Get("/apps", handleGetApps)
 
 		// note: front end needs to handle 413
 		r.Post("/upload", handleUpload)
 
 		r.Delete("/package/{id:string}", handleDeletePackage)
-
-		r.Get("/{id:string}", handleGetApp)
 	}
 }

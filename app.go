@@ -2,8 +2,8 @@ package main
 
 import "github.com/kataras/iris"
 
-type GetAppRes struct {
-	App      *App       `json:"app"`      // mask `installPassword`
+type AppDetail struct {
+	App      *App       `json:"app"`      // exclude `installPassword`
 	Current  *Version   `json:"current"`  // latest version
 	Packages []*Package `json:"packages"` // packages of latest version
 	Versions []*Version `json:"versions"` // other versions
@@ -19,7 +19,7 @@ func handleGetApp(ctx iris.Context) {
 		return
 	}
 
-	res := &GetAppRes{}
+	res := &AppDetail{}
 	res.App = app
 
 	versions, err := db.getAppVersions(app.ID)
@@ -42,4 +42,14 @@ func handleGetApp(ctx iris.Context) {
 	res.Packages = pkgs
 
 	ctx.JSON(res)
+}
+
+func handleGetApps(ctx iris.Context) {
+	apps, err := db.getApps()
+
+	if err != nil {
+		panic(err)
+	}
+
+	ctx.JSON(apps)
 }

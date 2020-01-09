@@ -33,14 +33,17 @@ var config = struct {
 	DBPath             string
 	MaxRequestBodySize int64
 	RootDir            string
+	AdminToken         string
 }{}
 
 func parseFlags() {
+	// port
 	kingpin.
 		Flag("port", "Server running port").
 		Short('p').Default("3389").
 		IntVar(&config.Port)
 
+	// db
 	dbFlag := kingpin.Flag("db", "Sqlite3 database path")
 	dbFlag.Short('d')
 	dbFlag.StringVar(&config.DBPath)
@@ -50,8 +53,10 @@ func parseFlags() {
 		dbFlag.Default(debugDefaultDBPath)
 	}
 
+	// max package size
 	size := kingpin.Flag("size", "Max package size").Short('s').Default("50MB").Bytes()
 
+	// root data dir
 	rootFlag := kingpin.Flag("root", "Root dir path")
 	rootFlag.Short('r')
 	rootFlag.StringVar(&config.RootDir)
@@ -60,6 +65,9 @@ func parseFlags() {
 	} else {
 		rootFlag.Default(debugDefaultRootDir)
 	}
+
+	// admin token
+	kingpin.Flag("token", "Admin token").Default("admin").StringVar(&config.AdminToken)
 
 	kingpin.Version(fmt.Sprintf("%s(%s)", appVersion, appHash))
 	kingpin.CommandLine.HelpFlag.Short('h')
