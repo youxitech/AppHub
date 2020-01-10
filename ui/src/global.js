@@ -1,26 +1,46 @@
 import "@babel/polyfill"
-import qs from "qs"
 import axios from "axios"
 import * as util from "util"
-import displayError from "error"
 import Vue from "vue"
+import Notifications from "vue-notification"
+import "normalize.css"
+import db from "db"
+import router from "./router"
+import { format } from "date-fns"
+import vmodal from "vue-js-modal"
 
 // => Vue Config
 Vue.config.warnHandler = (msg, vm, trace) => {
   if(msg.startsWith("Invalid component name")) return
   console.error(msg, trace)
 }
+Vue.use(Notifications)
+Vue.use(vmodal)
+Vue.mixin({
+  methods: {
+    _log: console.log,
+    _getAsset: util.getAsset,
+  },
 
-Object.defineProperty(Vue.prototype, "$query", {
-  get() {
-    return qs.parse(window.location.search.slice(1))
+  filters: {
+    formatTime(time) {
+      return format(new Date(time), "yyyy-MM-dd HH:mm")
+    },
+
+    bytesToSize(bytes) {
+      const sizes = ["Bytes", "KB", "MB", "GB", "TB"]
+      if(bytes === 0) return "0 Byte"
+      const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)))
+      return Math.round(bytes / Math.pow(1024, i), 2) + " " + sizes[i]
+    },
   },
 })
 
 // => Global Variables
 window.axios = axios
 window._util = util
-window._displayError = displayError
+window._displayError = util.displayError
+window._db = db
 window._global = {
   isDev: location.port !== "",
 }
@@ -28,8 +48,14 @@ window._global = {
 // => Axios Config
 axios.defaults.baseURL = "/api"
 axios.interceptors.request.use(config => {
-  // add custom headers
+  config.headers.common["X-Admin-Token"] = db.token
   return config
+})
+axios.interceptors.response.use(null, e => {
+  if(e.response.status === 401) {
+    router.push("/login")
+  }
+  return Promise.reject(e)
 })
 
 // => Global Components

@@ -37,7 +37,7 @@ module.exports = {
     app: "./src/main.js",
   },
   output: {
-    path: resolve("dist"),
+    path: resolve("../static/ui"),
     publicPath: "/",
   },
   resolve: {
