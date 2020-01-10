@@ -51,11 +51,11 @@ export default {
 
 <style lang="stylus">
 .pkg
-  background-image: url("~../../static/pkg-bg.png")
+  background-image: url("/static/pkg-bg.png")
   background-size: cover
 
 .pkg__qrcode
-  background-image: url("~../../static/phone.png")
+  background-image: url("/static/phone.png")
   background-size: cover
   width 300px
   height 450px

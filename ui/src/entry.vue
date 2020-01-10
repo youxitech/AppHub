@@ -42,8 +42,10 @@ export default {
 </script>
 
 <style type="text/css">
-@tailwind base;
-@tailwind components;
+/* purgecss start ignore */
+@tailwind  base;
+@tailwind  components;
+/* purgecss end ignore */
 @tailwind utilities;
 </style>
 

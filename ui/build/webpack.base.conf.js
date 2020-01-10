@@ -2,9 +2,14 @@ const path = require("path")
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 const webpack = require("webpack")
 const { VueLoaderPlugin } = require("vue-loader")
-
 const resolve = dir => path.join(__dirname, "..", dir)
 const apiEnv = process.env.API_ENV || "dev"
+const purgecss = require('@fullhuman/postcss-purgecss')({
+  content: [
+    "./src/**/*.vue",
+  ],
+  defaultExtractor: content => content.match(/[\w-/:]+(?<!:)/g) || [],
+})
 
 const postcssLoader = {
   loader: "postcss-loader",
@@ -13,6 +18,9 @@ const postcssLoader = {
     plugins: loader => [
       require("tailwindcss")(),
       require("autoprefixer")(),
+      ...process.env.NODE_ENV === "production"
+        ? [purgecss]
+        : []
     ],
   },
 }
