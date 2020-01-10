@@ -1,7 +1,8 @@
 
 -- +migrate Up
 create table app(
-  id text not null primary key,
+  id integer primary key,
+  alias text not null unique,
   name text not null,
   platform text not null check(platform = 'ios' or platform = 'android'),
   bundle_id text not null,
@@ -14,7 +15,7 @@ create table app(
 create table version(
   id integer primary key,
   version text, -- generated full version string
-  app_id text not null references app(id),
+  app_id int not null references app(id),
   android_version_code text not null default '',
   android_version_name text not null default '',
   ios_short_version text not null default '',

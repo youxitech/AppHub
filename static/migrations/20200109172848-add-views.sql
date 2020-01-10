@@ -2,7 +2,7 @@
 -- +migrate Up
 create view if not exists simple_app as
   select
-    id, name, platform, bundle_id, download_count
+    id, name, alias, platform, bundle_id, download_count
   from
     app
 ;

@@ -10,14 +10,14 @@ import (
 //	app: SimpleApp
 //	versions: [DetailVersion]
 //	packages: [Package] packages of current versions
-func handleGetApp(ctx iris.Context) {
+func handleGetAppByAlias(ctx iris.Context) {
 	res := iris.Map{
 		"app":      nil,
 		"versions": emptyArray,
 		"packages": emptyArray,
 	}
 
-	app := db.getApp(ctx.Params().Get("id"))
+	app := db.getAppByAlias(ctx.Params().Get("alias"))
 
 	if app == nil {
 		ctx.NotFound()
@@ -58,24 +58,20 @@ func handleGetApps(ctx iris.Context) {
 	ctx.JSON(apps)
 }
 
-func handleSetAppID(ctx iris.Context) {
+func handleSetAppAlias(ctx iris.Context) {
 	payload := &struct {
-		ID string `json:"id"`
+		Alias string `json:"alias"`
 	}{}
 
 	if err := ctx.ReadJSON(payload); err != nil {
 		panic400("bad json payload: %v", err)
 	}
 
-	appID := ctx.Params().Get("id")
+	appID, _ := ctx.Params().GetIntUnslashed("id")
 
-	if payload.ID == appID {
-		return
-	}
-
-	if _, err := db.Exec("update app set id = $1 where id = $2", payload.ID, appID); err != nil {
-		if isAppIDUniqueError(err) {
-			panic400("current id unavailable")
+	if _, err := db.Exec("update app set alias = $1 where id = $2", payload.Alias, appID); err != nil {
+		if isAppAliasUniqueError(err) {
+			panic400("current alias unavailable")
 		} else {
 			panic(err)
 		}

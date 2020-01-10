@@ -4,7 +4,8 @@ import "time"
 
 /*----------  Corresponding to Database Views or Tables ----------*/
 type SimpleApp struct {
-	ID            string `db:"id" json:"id"`
+	ID            int    `db:"id" json:"id"`
+	Alias         string `db:"alias" json:"alias"`
 	Name          string `db:"name" json:"name"`
 	Platform      string `db:"platform" json:"platform"`
 	BundleID      string `db:"bundle_id" json:"bundleID"`
@@ -19,7 +20,7 @@ type App struct {
 type Version struct {
 	ID                 int    `db:"id" json:"id"`
 	Version            string `db:"version" json:"version"`
-	AppID              string `db:"app_id" json:"appID"`
+	AppID              int    `db:"app_id" json:"appID"`
 	AndroidVersionCode string `db:"android_version_code" json:"androidVersionCode"`
 	AndroidVersionName string `db:"android_version_name" json:"androidVersionName"`
 	IOSShortVersion    string `db:"ios_short_version" json:"iosShortVersion"`

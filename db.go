@@ -129,19 +129,19 @@ func (db *DB) createPackage(
 func (db *DB) insertApp(app *App) error {
 	_, err := db.NamedExec(`
 		insert into app(
-			id, name, platform, bundle_id
+			alias, name, platform, bundle_id
 		)
 		values(
-			:id, :name, :platform, :bundle_id
+			:alias, :name, :platform, :bundle_id
 		)
 			`, app)
 	return err
 }
 
-// handle app.id unique constraint
+// handle app.alias unique constraint
 func (db *DB) ensureInsertApp(app *App) error {
 	for {
-		app.ID = randomStr(4)
+		app.Alias = randomStr(4)
 
 		err := db.insertApp(app)
 
@@ -149,7 +149,7 @@ func (db *DB) ensureInsertApp(app *App) error {
 			return nil
 		}
 
-		if isAppIDUniqueError(err) {
+		if isAppAliasUniqueError(err) {
 			continue
 		} else {
 			return err
@@ -162,9 +162,9 @@ func (db *DB) deletePackage(id string) error {
 	return err
 }
 
-func (db *DB) getApp(id string) *SimpleApp {
+func (db *DB) getAppByAlias(alias string) *SimpleApp {
 	app := &SimpleApp{}
-	err := db.Get(app, "select * from simple_app where id = $1", id)
+	err := db.Get(app, "select * from simple_app where alias = $1", alias)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -189,7 +189,7 @@ func (db *DB) getApps() ([]*SimpleApp, error) {
 }
 
 // sort by sort_key desc
-func (db *DB) getAppDetailedVersions(appID string) ([]*DetailVersion, error) {
+func (db *DB) getAppDetailedVersions(appID int) ([]*DetailVersion, error) {
 	var versions []*DetailVersion
 
 	if err := db.Select(&versions, "select * from detail_version where app_id = $1", appID); err != nil {
@@ -226,13 +226,11 @@ func (db *DB) getVersionPackages(versionID int) ([]*Package, error) {
 	return pkgs, nil
 }
 
-func isAppIDUniqueError(err error) bool {
+func isAppAliasUniqueError(err error) bool {
 	if e, ok := err.(sqlite3.Error); ok {
-		if (e.ExtendedCode == sqlite3.ErrConstraintUnique ||
+		return (e.ExtendedCode == sqlite3.ErrConstraintUnique ||
 			e.ExtendedCode == sqlite3.ErrConstraintPrimaryKey) &&
-			strings.Contains(err.Error(), "app.id") {
-			return true
-		}
+			strings.Contains(err.Error(), "app.alias")
 	}
 
 	return false
