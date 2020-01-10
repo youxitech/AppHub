@@ -55,7 +55,7 @@ func handleUpload(ctx iris.Context) {
 	}
 
 	// create package
-	pkg, err := db.createPackage(appInfo, fileName, versionRemark, pkgRemark, md5)
+	app, version, pkg, err := db.createPackage(appInfo, fileName, versionRemark, pkgRemark, md5)
 	if err != nil {
 		panicErr(err)
 	}
@@ -66,7 +66,11 @@ func handleUpload(ctx iris.Context) {
 	}
 
 	// response
-	ctx.JSON(pkg)
+	ctx.JSON(iris.Map{
+		"app":     app,
+		"version": version,
+		"package": pkg,
+	})
 }
 
 // return true if valid

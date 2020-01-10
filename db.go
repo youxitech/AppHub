@@ -49,7 +49,7 @@ func (db *DB) getPackage(id string) *Package {
 func (db *DB) createPackage(
 	info *parser.AppInfo, fileName, versionRemark, pkgRemark string,
 	pkgID string,
-) (*Package, error) {
+) (*App, *Version, *Package, error) {
 	// fetch app
 	app := &App{}
 	{
@@ -65,7 +65,7 @@ func (db *DB) createPackage(
 			app.Platform = info.Platform
 			app.BundleID = info.BundleID
 			if err := db.ensureInsertApp(app); err != nil {
-				return nil, errors.Wrap(err, "could not insert app")
+				return nil, nil, nil, errors.Wrap(err, "could not insert app")
 			}
 		}
 	}
@@ -99,7 +99,7 @@ func (db *DB) createPackage(
 					:ios_short_version, :ios_bundle_version, :sort_key, :remark
 				)
 			`, version); err != nil {
-				return nil, errors.Wrap(err, "could not insert version")
+				return nil, nil, nil, errors.Wrap(err, "could not insert version")
 			} else {
 				id, _ := res.LastInsertId()
 				version.ID = int(id)
@@ -124,10 +124,10 @@ func (db *DB) createPackage(
 			:id, :version_id, :name, :size, :created_at, :remark
 		)
 			`, pkg); err != nil {
-		return nil, errors.Wrap(err, "could not insert package")
+		return nil, nil, nil, errors.Wrap(err, "could not insert package")
 	}
 
-	return pkg, nil
+	return app, version, pkg, nil
 }
 
 // need to assign ID
