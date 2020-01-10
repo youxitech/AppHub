@@ -30,6 +30,8 @@ var config = struct {
 	MaxRequestBodySize int64
 	RootDir            string
 	AdminToken         string
+	TLSCert            string
+	TLSKey             string
 }{}
 
 func parseFlags() {
@@ -62,7 +64,18 @@ func parseFlags() {
 		StringVar(&config.RootDir)
 
 	// admin token
-	kingpin.Flag("token", "Admin token").Default("admin").StringVar(&config.AdminToken)
+	kingpin.
+		Flag("token", "Admin token").
+		Default("admin").
+		StringVar(&config.AdminToken)
+
+	// tls
+	kingpin.
+		Flag("tls-cert", "TLS cert file path").
+		StringVar(&config.TLSCert)
+	kingpin.
+		Flag("tls-key", "TLS private key file path").
+		StringVar(&config.TLSKey)
 
 	kingpin.Version(fmt.Sprintf("%s(%s)", appVersion, appHash))
 	kingpin.CommandLine.HelpFlag.Short('h')
@@ -74,6 +87,10 @@ func parseFlags() {
 
 func main() {
 	parseFlags()
+
+	if (config.TLSCert != "" && config.TLSKey == "") || (config.TLSCert == "" && config.TLSKey != "") {
+		golog.Fatal("to enable TLS, must provide both --tls-cert and --tls-key")
+	}
 
 	os.MkdirAll(config.RootDir, 0755)
 
@@ -95,8 +112,17 @@ func main() {
 
 	golog.Infof("app is running on port %d", config.Port)
 
+	var runner iris.Runner
+
+	addr := fmt.Sprintf(":%d", config.Port)
+	if config.TLSKey != "" {
+		runner = iris.TLS(addr, config.TLSCert, config.TLSKey)
+	} else {
+		runner = iris.Addr(addr)
+	}
+
 	app.Run(
-		iris.Addr(fmt.Sprintf(":%d", config.Port)),
+		runner,
 		iris.WithoutServerError(iris.ErrServerClosed),
 		iris.WithoutBanner,
 	)

@@ -31,9 +31,11 @@ down:
 
 # prod build
 bundle:
-	rm -rf static/ui
-	cd ui && yarn && yarn build
-	make bindata-prod
-	tag=$$(git tag --points-at HEAD) && version=$${tag:-debug} && go build $(GO_FLAGS) -o tmp/apphub-$$version
-	make bindata
+# 	rm -rf static/ui
+# 	cd ui && yarn && yarn build
+# 	make bindata-prod
+	tag=$$(git tag --points-at HEAD) && version=$${tag:-debug} && \
+	go build $(GO_FLAGS) -o tmp/apphub-$$version-darwin-amd64 && \
+	GOOS=linux GOARCH=amd64 go build $(GO_FLAGS) -o tmp/apphub-$$version-linux-amd64
+# 	make bindata
 .PHONY: bundle
