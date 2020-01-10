@@ -12,43 +12,47 @@ import (
 )
 
 var _now = time.Now()
-var _index, _ = Asset("index.html")
+var _index, _ = Asset("ui/index.html")
 
 // cache polify
 //	*.html: never cache
 //  others: cache permanently
-func serveFile(ctx iris.Context, name string, buf []byte) {
+// root dir: static/ui
+func serveUIFile(ctx iris.Context, p string) {
 	// never cache
-	if strings.HasSuffix(name, ".html") {
+	if strings.HasSuffix(p, ".html") {
 		ctx.Header("Cache-Control", "no-cache")
 	} else {
 		ctx.Header("Cache-Control", "public")
 	}
 
+	buf, err := Asset(path.Join("ui", p))
+	var result []byte
+
+	if err == nil {
+		result = buf
+	} else {
+		// default to index.html
+		result = _index
+	}
+
 	// we don't care the modtime
-	http.ServeContent(ctx.ResponseWriter(), ctx.Request(), path.Base(name), _now, bytes.NewReader(buf))
+	http.ServeContent(ctx.ResponseWriter(), ctx.Request(), path.Base(p), _now, bytes.NewReader(result))
 }
 
 func mounteRoute(app *iris.Application) {
-	// static assets
+	// handle ui requests, static/ui is the root dir
 	app.Get("*", func(ctx iris.Context) {
-		name := ctx.Request().URL.Path
+		path := ctx.Request().URL.Path
 
 		// index.html
-		if name == "/" {
-			serveFile(ctx, "index.html", _index)
+		if path == "/" {
+			serveUIFile(ctx, "index.html")
 			return
 		}
 
 		// try files
-		buf, err := Asset(name[1:])
-		if err == nil {
-			serveFile(ctx, name, buf)
-			return
-		}
-
-		// default to index.html
-		serveFile(ctx, "index.html", _index)
+		serveUIFile(ctx, path)
 	})
 
 	// data files
