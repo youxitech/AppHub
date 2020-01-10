@@ -7,6 +7,19 @@ import db from "db"
 import router from "./router"
 import { format } from "date-fns"
 import vmodal from "vue-js-modal"
+import "@uppy/core/dist/style.css"
+import "@uppy/progress-bar/dist/style.css"
+import "@uppy/drag-drop/dist/style.css"
+
+// => Global Variables
+window.axios = axios
+window._util = util
+window._displayError = util.displayError
+window._db = db
+window._global = {
+  isDev: location.port !== "",
+  isIos: !!navigator.userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/),
+}
 
 // => Vue Config
 Vue.config.warnHandler = (msg, vm, trace) => {
@@ -16,6 +29,12 @@ Vue.config.warnHandler = (msg, vm, trace) => {
 Vue.use(Notifications)
 Vue.use(vmodal)
 Vue.mixin({
+  data() {
+    return {
+      global: _global,
+    }
+  },
+
   methods: {
     _log: console.log,
     _getAsset: util.getAsset,
@@ -34,15 +53,6 @@ Vue.mixin({
     },
   },
 })
-
-// => Global Variables
-window.axios = axios
-window._util = util
-window._displayError = util.displayError
-window._db = db
-window._global = {
-  isDev: location.port !== "",
-}
 
 // => Axios Config
 axios.defaults.baseURL = "/api"

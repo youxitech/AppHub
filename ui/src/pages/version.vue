@@ -9,6 +9,7 @@
           th.px-4.py-2 创建时间
           th.px-4.py-2 大小
           th.px-4.py-2 下载次数
+          th.px-4.py-2 二维码
       tbody
         tr(
           v-for="pkg of version.packages"
@@ -19,10 +20,21 @@
           td.border.px-4.py-2.text-center {{ pkg.createdAt | formatTime }}
           td.border.px-4.py-2.text-center {{ pkg.size | bytesToSize }}
           td.border.px-4.py-2.text-center {{ pkg.downloadCount }}
+          td.border.px-4.py-2.text-center
+            img(:src="pkg.qrcode")
 </template>
 
 <script>
+import QRCode from "qrcode"
+
 export default {
+  props: {
+    id: {
+      type: String,
+      default: "",
+    },
+  },
+
   data() {
     return {
       version: null,
@@ -35,9 +47,18 @@ export default {
 
   methods: {
     fetchVersion() {
-      axios.get(`/versions/${ this.$route.params.id }`)
+      axios.get(`/versions/${ this.id || this.$route.params.id }`)
         .then(res => {
           this.version = res.data
+          Promise.all(this.version.packages.map(pkg => QRCode.toDataURL(location.host + `/pkg/${ pkg.id }`)))
+            .then(res => {
+              this.version.packages = this.version.packages.map((item, index) => {
+                return {
+                  qrcode: res[index],
+                  ...item,
+                }
+              })
+            })
         })
         .catch(_displayError)
     },

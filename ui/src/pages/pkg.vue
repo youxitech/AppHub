@@ -10,7 +10,9 @@
     img.mt-16.w-40.h-40.ml-6(:src="this.qrcode")
     .mt-12.ml-6.text-gray-500 请扫描二维码下载APP
     .ml-6.text-gray-500 适用于 {{ pkg.app.platform }} 系统
+    _button.ml-6(v-if="global.isIos" @click="install") 安装
     a.ml-6(
+      v-else
       :href="_getAsset('bundle', pkg.app.platform, pkg.app.bundleID, pkg.version.version, pkg.package.id)"
       :download="pkg.package.name"
     )
@@ -44,6 +46,13 @@ export default {
           this.pkg = res.data
         })
         .catch(_displayError)
+    },
+
+    install() {
+      const url = ""
+      const a = document.createElement("a")
+      a.setAttribute("href", url)
+      a.click()
     },
   },
 }
