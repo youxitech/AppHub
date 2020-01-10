@@ -1,9 +1,9 @@
 run: install
-	apphub
+	apphub -d tmp/debug.sqlite3 -r tmp/data --host test.com
 .PHONY: run
 
 rundev:
-	apphub -p 3389
+	apphub -p 3389 -d tmp/debug.sqlite3 -r tmp/data --host test.com
 .PHONY: rundev
 
 install:

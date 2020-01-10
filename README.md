@@ -16,7 +16,7 @@ functions:
 - store download count
 - preview could be protected by a password
 - external api for ci usage
-- figure out ios package tyep: ad-hoc, appstore, etc...
+- **figure out ios package tyep: ad-hoc, appstore, etc..**
 - get device count when ad-hoc
 - upload progress
 - android support multiple channel packages

@@ -46,3 +46,16 @@ func handleSetActiveVersion(ctx iris.Context) {
 		panic(err)
 	}
 }
+
+func handleDeleteVersion(ctx iris.Context) {
+	id, ok := ctx.Params().GetIntUnslashed("id")
+	if !ok {
+		panic400("invalid id")
+	}
+
+	_, err := db.Exec("delete from version where id = $1", id)
+
+	if err != nil {
+		panic(err)
+	}
+}

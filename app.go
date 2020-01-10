@@ -17,7 +17,7 @@ func handleGetAppByAlias(ctx iris.Context) {
 		"packages": emptyArray,
 	}
 
-	app := db.getAppByAlias(ctx.Params().Get("alias"))
+	app := db.getAppByAliasOrID(ctx.Params().Get("alias"))
 
 	if app == nil {
 		ctx.NotFound()
@@ -75,5 +75,15 @@ func handleSetAppAlias(ctx iris.Context) {
 		} else {
 			panic(err)
 		}
+	}
+}
+
+func handleDeleteApp(ctx iris.Context) {
+	appID, _ := ctx.Params().GetIntUnslashed("id")
+
+	_, err := db.Exec("delete from app where id = $1", appID)
+
+	if err != nil {
+		panic(err)
 	}
 }

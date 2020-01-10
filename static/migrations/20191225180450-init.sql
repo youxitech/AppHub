@@ -15,7 +15,7 @@ create table app(
 create table version(
   id integer primary key,
   version text, -- generated full version string
-  app_id int not null references app(id),
+  app_id int not null references app(id) on delete cascade,
   android_version_code text not null default '',
   android_version_name text not null default '',
   ios_short_version text not null default '',
@@ -27,7 +27,7 @@ create table version(
 
 create table package(
   id string not null primary key,
-  version_id int not null references version(id),
+  version_id int not null references version(id) on delete cascade,
   download_count int not null default 0,
   name string not null unique,
   size int not null,

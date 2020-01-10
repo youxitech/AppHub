@@ -75,16 +75,11 @@ func isValidPackageName(name string) bool {
 }
 
 // root
-// - ios
-//   - bundle_id
+// - ios/android
+//   - [bundle_id]
 //     - icon.png
-//     - version
-//       - [id].ipa
-// - android
-//   - bundle_id
-//     - version
-//       - [id].apk
-//    - icon.png
+//     - [version.version]
+//       - [id].ipa/apk
 func savePackage(file io.Reader, pkg *Package, info *parser.AppInfo) error {
 	dir := path.Join(config.RootDir, info.Platform, info.BundleID, info.FullVersion())
 

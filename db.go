@@ -39,6 +39,10 @@ func (db *DB) getPackage(id string) *Package {
 		return nil
 	}
 
+	if err != nil {
+		panic(err)
+	}
+
 	return pkg
 }
 
@@ -126,8 +130,9 @@ func (db *DB) createPackage(
 	return pkg, nil
 }
 
+// need to assign ID
 func (db *DB) insertApp(app *App) error {
-	_, err := db.NamedExec(`
+	res, err := db.NamedExec(`
 		insert into app(
 			alias, name, platform, bundle_id
 		)
@@ -135,6 +140,12 @@ func (db *DB) insertApp(app *App) error {
 			:alias, :name, :platform, :bundle_id
 		)
 			`, app)
+
+	if err == nil {
+		id, _ := res.LastInsertId()
+		app.ID = int(id)
+	}
+
 	return err
 }
 
@@ -162,9 +173,18 @@ func (db *DB) deletePackage(id string) error {
 	return err
 }
 
-func (db *DB) getAppByAlias(alias string) *SimpleApp {
+// value could be alias(string) or id(int)
+func (db *DB) getAppByAliasOrID(value interface{}) *SimpleApp {
 	app := &SimpleApp{}
-	err := db.Get(app, "select * from simple_app where alias = $1", alias)
+	var err error
+
+	if id, ok := value.(int); ok {
+		err = db.Get(app, "select * from simple_app where id = $1", id)
+	} else if alias, ok := value.(string); ok {
+		err = db.Get(app, "select * from simple_app where alias = $1", alias)
+	} else {
+		panic("invalid value for getAppByAliasOrID")
+	}
 
 	if err != nil {
 		if err == sql.ErrNoRows {
