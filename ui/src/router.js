@@ -34,7 +34,7 @@ export default new Router({
           component: AdminApp,
         },
         {
-          path: ":id/version/:version",
+          path: ":id/:version",
           component: AdminVersion,
         },
       ],
@@ -45,7 +45,7 @@ export default new Router({
       component: Pkg,
     },
     {
-      path: "/:id/version/:version",
+      path: "/:id/:version",
       component: Version,
     },
     {
