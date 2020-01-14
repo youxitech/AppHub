@@ -89,7 +89,7 @@ export default {
             text: "Success!",
           })
           // query t: 用于当前页就是 version 页时，刷新数据
-          this.$router.push(`/admin/${ response.body.app.alias }/version/${ response.body.version.version }?t=${ new Date().getTime() }`)
+          this.$router.push(`/admin/${ response.body.app.alias }/${ response.body.version.version }?t=${ new Date().getTime() }`)
         })
         .on("upload-error", (file, error, response) => {
           _displayError(response.body.msg)

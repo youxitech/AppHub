@@ -1,7 +1,7 @@
 module.exports = {
   port: 8880,
   proxyTable: {
-    "**/version/*.*": {
+    "!(/api)**/v*.*": {
       target: 'http://localhost:8880/',
       router: function (req) {
         req.url = "index.html"

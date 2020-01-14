@@ -47,13 +47,16 @@ export default {
   },
 
   mounted() {
+    console.log("versioin")
     this.fetchVersion()
   },
 
   methods: {
     fetchVersion() {
+      console.log("fetch")
       axios.get(`/${ this.alias || this.$route.params.id }/${ this.id || this.$route.params.version }`)
         .then(res => {
+          console.log(res.data)
           this.version = res.data
           Promise.all(this.version.packages.map(pkg => QRCode.toDataURL(location.host + `/pkg/${ pkg.id }`)))
             .then(res => {
