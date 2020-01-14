@@ -45,7 +45,7 @@ export default new Router({
       component: Pkg,
     },
     {
-      path: "/version/:id",
+      path: "/:id/version/:version",
       component: Version,
     },
     {

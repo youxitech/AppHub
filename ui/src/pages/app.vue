@@ -8,7 +8,7 @@
         .text-sm.text-gray-600.mt-3 Platform: {{ app.app.platform }}
         .text-sm.text-gray-600 BundleID: {{ app.app.bundleID }}
         .text-sm.text-gray-600 Download: {{ app.app.downloadCount }}
-      .flex.ml-auto.items-center APP ID: {{ app.app.alias }}
+      .flex.ml-auto.items-center APP alias: {{ app.app.alias }}
 
   version(:id="String(app.versions[0].id)")
 </template>
