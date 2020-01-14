@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"path"
 	"strings"
 	"time"
@@ -65,7 +64,6 @@ func mounteRoute(app *iris.Application) {
 			return
 		}
 
-		fmt.Println(p)
 		ctx.ServeFile(p, false)
 	})
 
