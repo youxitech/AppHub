@@ -2,8 +2,14 @@
 .admin.h-screen.flex.flex-col
   header(class="w-full border-b border-gray-200 h-16 flex items-center p-6")
     a(href="/" class="block lg:mr-4") App Hub
-    _button(@click="showUploader") +
-  main(class="w-full flex flex-1")
+    _button(@click="$modal.show('uploader')") +
+    _button.ml-auto(@click="logout") logout
+
+  div(v-if="apps.length === 0") 请先上传 APP
+  main(
+    v-else
+    class="w-full flex flex-1"
+  )
     nav(class="w-40 border-b border-r")
       .flex.cursor-pointer(
         v-for="app in apps"
@@ -19,7 +25,10 @@
     .flex-1.bg-gray-200.p-6
       router-view
 
-  modal(name="uploader")
+  modal(
+    name="uploader"
+    @opened="beforeOpen"
+  )
     .w-64.h-64.flex.flex-col.items-center
       .uploader
       .uploader__progress-bar.w-64
@@ -59,39 +68,41 @@ export default {
         .catch(_displayError)
     },
 
-    showUploader() {
-      this.$modal.show("uploader")
-      // @FIX
-      setTimeout(() => {
-        const uppy = new Uppy({ debug: true, autoProceed: true })
-        uppy
-          .use(DragDrop, { target: ".uploader" })
-          .use(ProgressBar, { target: ".uploader__progress-bar", hideAfterFinish: false })
-          .use(XHRUpload, {
-            endpoint: "/api/admin/upload",
-            formData: true,
-            fieldName: "file",
-            headers: {
-              "X-Admin-Token": _db.token,
-            },
+    beforeOpen() {
+      const uppy = new Uppy({ autoProceed: true })
+      uppy
+        .use(DragDrop, { target: ".uploader" })
+        .use(ProgressBar, { target: ".uploader__progress-bar", hideAfterFinish: false })
+        .use(XHRUpload, {
+          endpoint: "/api/admin/upload",
+          formData: true,
+          fieldName: "file",
+          headers: {
+            "X-Admin-Token": _db.token,
+          },
+        })
+        .on("upload-success", (file, response) => {
+          this.$modal.hide("uploader")
+          this.$notify({
+            type: "success",
+            text: "Success!",
           })
-          .on("upload-success", (file, response) => {
-            this.$modal.hide("uploader")
-            this.$notify({
-              type: "success",
-              text: "Success!",
-            })
-            this.$router.push(`/admin/${ response.body.app.alias }/version/${ response.body.version.id }?t=${ new Date().getTime() }`)
-          })
-          .on("upload-error", (file, error, response) => {
-            _displayError(response.body.msg)
-            this.$modal.hide("uploader")
-          })
-      }, 100)
+          // query t: 用于当前页就是 version 页时，刷新数据
+          this.$router.push(`/admin/${ response.body.app.alias }/version/${ response.body.version.id }?t=${ new Date().getTime() }`)
+        })
+        .on("upload-error", (file, error, response) => {
+          _displayError(response.body.msg)
+          this.$modal.hide("uploader")
+        })
     },
 
     onClickNav(alias) {
       this.$router.push(`/admin/${ alias }`)
+    },
+
+    logout() {
+      _db.token = ""
+      this.$router.push("/login")
     },
   },
 }

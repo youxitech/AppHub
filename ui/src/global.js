@@ -27,7 +27,7 @@ Vue.config.warnHandler = (msg, vm, trace) => {
   console.error(msg, trace)
 }
 Vue.use(Notifications)
-Vue.use(vmodal)
+Vue.use(vmodal, { injectModalsContainer: true })
 Vue.mixin({
   data() {
     return {
