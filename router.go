@@ -2,8 +2,7 @@ package main
 
 import (
 	"bytes"
-	"net/http"
-	"os"
+	"fmt"
 	"path"
 	"strings"
 	"time"
@@ -37,7 +36,7 @@ func serveUIFile(ctx iris.Context, p string) {
 	}
 
 	// we don't care the modtime
-	http.ServeContent(ctx.ResponseWriter(), ctx.Request(), path.Base(p), _now, bytes.NewReader(result))
+	ctx.ServeContent(bytes.NewReader(result), path.Base(p), _now, true)
 }
 
 func mounteRoute(app *iris.Application) {
@@ -66,12 +65,8 @@ func mounteRoute(app *iris.Application) {
 			return
 		}
 
-		file, err := os.Open(p)
-		if err != nil {
-			panic(err)
-		}
-
-		http.ServeContent(ctx.ResponseWriter(), ctx.Request(), path.Base(p), _now, file)
+		fmt.Println(p)
+		ctx.ServeFile(p, false)
 	})
 
 	r := app.Party("/api")

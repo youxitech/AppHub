@@ -49,6 +49,9 @@ func handleUpload(ctx iris.Context) {
 	}
 	md5 := fmt.Sprintf("%x", md5.Sum(buf))
 
+	// seek file
+	file.Seek(0, 0)
+
 	// get package
 	if pkg := db.getPackage(md5); pkg != nil {
 		panic400("Package 已存在")
