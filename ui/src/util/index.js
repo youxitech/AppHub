@@ -18,9 +18,10 @@ export const getAsset = (type, platform, bundleId, versionId, pkgId) => {
 }
 
 export const displayError = e => {
+  console.error(e)
   let text
   try {
-    text = e.response.data.msg || "Some error occurred"
+    text = typeof e === "string" ? e : (e.response.data.msg || "Some error occurred")
   } catch(error) {
     text = "Some error occurred"
   }

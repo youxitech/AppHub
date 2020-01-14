@@ -30,7 +30,7 @@ export default {
       })
         .then(() => {
           _db.token = "admin"
-          this.$router.push("/dashboard")
+          this.$router.push("/admin")
         })
         .catch(_displayError)
     },

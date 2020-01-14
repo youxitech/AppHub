@@ -3,9 +3,12 @@ import Router from "vue-router"
 import db from "db"
 
 import Login from "@/login"
-import Dashboard from "@/dashboard"
+import Admin from "@/admin"
+import AdminApp from "@/admin-app"
+import AdminVersion from "@/admin-version"
 import Pkg from "@/pkg"
 import Version from "@/version"
+import App from "@/app"
 import NotFound from "@/404"
 
 Vue.use(Router)
@@ -13,18 +16,30 @@ Vue.use(Router)
 export default new Router({
   mode: "history",
   routes: [
+    // admin
     {
       path: "/",
-      redirect: () => db.token ? "/dashboard" : "/login",
+      redirect: () => db.token ? "/admin" : "/login",
     },
     {
       path: "/login",
       component: Login,
     },
     {
-      path: "/dashboard",
-      component: Dashboard,
+      path: "/admin",
+      component: Admin,
+      children: [
+        {
+          path: ":id",
+          component: AdminApp,
+        },
+        {
+          path: ":id/version/:version",
+          component: AdminVersion,
+        },
+      ],
     },
+    // customer
     {
       path: "/pkg/:id",
       component: Pkg,
@@ -32,6 +47,10 @@ export default new Router({
     {
       path: "/version/:id",
       component: Version,
+    },
+    {
+      path: "/:id",
+      component: App,
     },
     {
       path: "*",
