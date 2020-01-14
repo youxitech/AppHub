@@ -7,9 +7,12 @@ import db from "db"
 import router from "./router"
 import { format } from "date-fns"
 import vmodal from "vue-js-modal"
+
 import "@uppy/core/dist/style.css"
 import "@uppy/progress-bar/dist/style.css"
 import "@uppy/drag-drop/dist/style.css"
+// import all tailwind
+import "tailwindcss/tailwind.css"
 
 // => Global Variables
 window.axios = axios
