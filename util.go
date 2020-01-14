@@ -73,7 +73,7 @@ func fileExists(path string) bool {
 // for android: this is $VersionName
 func getFullVersion(a *parser.AppInfo) string {
 	if a.Platform == "ios" {
-		return fmt.Sprintf("%s.%s", a.IOSShortVersion, a.IOSBundleVersion)
+		return fmt.Sprintf("v%s.%s", a.IOSShortVersion, a.IOSBundleVersion)
 	}
 
 	return a.AndroidVersionName
