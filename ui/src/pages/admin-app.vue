@@ -27,12 +27,12 @@
         td.border.px-4.py-2.text-center
           .flex.items-center.justify-center
             .rounded-full.h-3.w-3.mr-3(:class="index === 0 ? 'bg-teal-500' : 'bg-white'")
-            a(class="text-blue-500 hover:text-blue-800" :href="`/admin/${ app.app.alias }/version/${ version.id }`") {{ version.version }}
+            a(class="text-blue-500 hover:text-blue-800" :href="`/admin/${ app.app.alias }/version/${ version.version }`") {{ version.version }}
         td.border.px-4.py-2.text-center {{ version.downloadCount }}
         td.border.px-4.py-2.text-center {{ version.pacakgeCount }}
         td.border.px-4.py-2.text-center {{ version.updatedAt | formatTime }}
         td.border.px-4.py-2.text-center
-          a(class="text-blue-500 hover:text-blue-800" :href="`/${app.app.alias}/version/${ version.id }`") 预览
+          a(class="text-blue-500 hover:text-blue-800" :href="`/${app.app.alias}/version/${ version.version }`") 预览
           button(class="hover:text-teal-500" @click="() => setDefaultVersion(version.id)") 设为默认版本
           button(class="ml-3 hover:text-teal-500" @click="() => onDeleteVersion(version.id)") 删除
 

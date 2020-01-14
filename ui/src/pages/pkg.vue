@@ -51,7 +51,6 @@ export default {
     install() {
       const url = `itms-services://?action=download-manifest&url=${ location.origin }/api/plist/${ this.pkg.package.id }`
       const a = document.createElement("a")
-      alert(url)
       a.setAttribute("href", url)
       a.click()
     },
