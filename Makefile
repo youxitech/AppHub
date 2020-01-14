@@ -32,17 +32,20 @@ down:
 build-ui:
 	rm -rf static/ui
 	cd ui && yarn && yarn build
-	make bindata-prod
 .PHONY: build-ui
 
 build-darwin:
+	make bindata-prod
 	tag=$$(git tag --points-at HEAD) && version=$${tag:-debug} && \
 	go build $(GO_FLAGS) -o tmp/apphub-$$version-amd64-darwin
+	make bindata
 .PHONY: build-darwin
 
 build-linux:
+	make bindata-prod
 	tag=$$(git tag --points-at HEAD) && hash=$$(git rev-parse --short HEAD) && version=$${tag:-$$hash} && \
 	CC=x86_64-linux-musl-gcc CXX=x86_64-linux-musl-g++ GOARCH=amd64 GOOS=linux CGO_ENABLED=1 go build $(GO_FLAGS) -ldflags "-linkmode external -extldflags -static" -o tmp/apphub-$$version-amd64-linux
+	make bindata
 .PHONY: build-linux
 
 bundle: build-ui build-darwin build-linux

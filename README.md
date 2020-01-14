@@ -1,5 +1,8 @@
 # AppHub
 
+note:
+- ngnix client_max_body_size
+
 functions:
 - figure out ios package tyep: ad-hoc, appstore, etc..
 - get device count when ad-hoc

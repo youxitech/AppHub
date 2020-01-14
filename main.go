@@ -55,7 +55,7 @@ func parseFlags() {
 		StringVar(&config.Host)
 
 	// max package size
-	size := kingpin.Flag("size", "Max package size").Short('s').Default("50MB").Bytes()
+	size := kingpin.Flag("size", "Max package size").Short('s').Default("100MB").Bytes()
 
 	// root data dir
 	kingpin.Flag("root", "Root dir path").
