@@ -7,11 +7,10 @@ import (
 )
 
 func handleGetVersion(ctx iris.Context) {
-	id, ok := ctx.Params().GetIntUnslashed("id")
-	if !ok {
-		panic400("invalid id")
-	}
-	version := db.getVersion(id)
+	appAlias := ctx.Params().Get("alias")
+	fullVersion := ctx.Params().Get("version")
+
+	version := db.getVersionByAppAliasAndFullVersion(appAlias, fullVersion)
 
 	if version == nil {
 		ctx.NotFound()

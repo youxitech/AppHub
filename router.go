@@ -77,7 +77,7 @@ func mounteRoute(app *iris.Application) {
 
 		r.Get("/:alias", handleGetAppByAlias)
 
-		r.Get("/versions/:id", handleGetVersion)
+		r.Get("/:alias/:version", handleGetVersion)
 
 		r.Get("/packages/:id", handleGetPackage)
 

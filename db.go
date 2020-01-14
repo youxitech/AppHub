@@ -235,6 +235,32 @@ func (db *DB) getVersion(id int) *DetailVersion {
 	return ver
 }
 
+// return null if not exists
+func (db *DB) getVersionByAppAliasAndFullVersion(appAlias, fullVersion string) *DetailVersion {
+	app := db.getAppByAliasOrID(appAlias)
+	if app == nil {
+		return nil
+	}
+
+	ver := &DetailVersion{}
+	err := db.Get(
+		ver,
+		"select * from detail_version where app_id = $1 and version = $2",
+		app.ID,
+		fullVersion,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil
+		} else {
+			panic(err)
+		}
+	}
+
+	return ver
+}
+
 // sort by created_at desc
 func (db *DB) getVersionPackages(versionID int) ([]*Package, error) {
 	pkgs := make([]*Package, 0)
