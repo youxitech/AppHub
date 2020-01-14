@@ -10,7 +10,10 @@
         .text-sm.text-gray-600 Download: {{ app.app.downloadCount }}
       .flex.ml-auto.items-center APP alias: {{ app.app.alias }}
 
-  version(:id="String(app.versions[0].id)")
+  version(
+    :id="String(app.versions[0].version)"
+    :alias="app.app.alias"
+  )
 </template>
 
 <script>

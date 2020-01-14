@@ -1,6 +1,10 @@
 <template lang="pug">
 .admin-version
-  version(:key="key" :id="$route.params.version")
+  version(
+    :key="key"
+    :id="$route.params.version"
+    :alias="$route.params.alias"
+  )
 </template>
 
 <script>

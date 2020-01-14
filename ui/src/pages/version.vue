@@ -33,6 +33,11 @@ export default {
       type: String,
       default: "",
     },
+
+    alias: {
+      type: String,
+      default: "",
+    },
   },
 
   data() {
@@ -47,7 +52,7 @@ export default {
 
   methods: {
     fetchVersion() {
-      axios.get(`/versions/${ this.id || this.$route.params.version }`)
+      axios.get(`/${ this.alias || this.$route.params.id }/${ this.id || this.$route.params.version }`)
         .then(res => {
           this.version = res.data
           Promise.all(this.version.packages.map(pkg => QRCode.toDataURL(location.host + `/pkg/${ pkg.id }`)))
