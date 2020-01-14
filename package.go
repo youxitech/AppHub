@@ -105,8 +105,8 @@ func handleGetPlist(ctx iris.Context) {
 		suffix = "apk"
 	}
 	payload.DownloadURL = fmt.Sprintf(
-		"%s:%s/data/%s/%s/%s/%s.%s",
-		"http", config.Host,
+		"%s/data/%s/%s/%s/%s.%s",
+		config.Host,
 		app.Platform,
 		app.BundleID,
 		version.Version.Version,

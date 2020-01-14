@@ -50,7 +50,7 @@ func parseFlags() {
 
 	// host
 	kingpin.
-		Flag("host", "Server host url, e.g. google.com").
+		Flag("host", "Server host url without a trailing slash, e.g. https://google.com").
 		Required().
 		StringVar(&config.Host)
 

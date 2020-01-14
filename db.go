@@ -199,7 +199,7 @@ func (db *DB) getAppByAliasOrID(value interface{}) *SimpleApp {
 
 // App: id, name
 func (db *DB) getApps() ([]*SimpleApp, error) {
-	var apps []*SimpleApp
+	apps := make([]*SimpleApp, 0)
 
 	if err := db.Select(&apps, "select * from simple_app"); err != nil {
 		return nil, err
@@ -210,7 +210,7 @@ func (db *DB) getApps() ([]*SimpleApp, error) {
 
 // sort by sort_key desc
 func (db *DB) getAppDetailedVersions(appID int) ([]*DetailVersion, error) {
-	var versions []*DetailVersion
+	versions := make([]*DetailVersion, 0)
 
 	if err := db.Select(&versions, "select * from detail_version where app_id = $1", appID); err != nil {
 		return nil, err
@@ -237,7 +237,7 @@ func (db *DB) getVersion(id int) *DetailVersion {
 
 // sort by created_at desc
 func (db *DB) getVersionPackages(versionID int) ([]*Package, error) {
-	var pkgs []*Package
+	pkgs := make([]*Package, 0)
 
 	if err := db.Select(&pkgs, "select * from package where version_id = $1 order by created_at desc", versionID); err != nil {
 		return nil, err
