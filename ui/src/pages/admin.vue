@@ -62,7 +62,8 @@ export default {
       axios.get("/admin/apps")
         .then(res => {
           this.apps = res.data
-          if(this.$route.params.id) return
+          // 已选 app 或 没有 app 列表直接返回
+          if(this.$route.params.id || this.apps.length === 0) return
           this.$router.push(`/admin/${ this.apps[0].alias }`)
         })
         .catch(_displayError)

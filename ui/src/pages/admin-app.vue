@@ -8,7 +8,7 @@
       .text-sm.text-gray-600 BundleID: {{ app.app.bundleID }}
       .text-sm.text-gray-600 Download: {{ app.app.downloadCount }}
     .flex.ml-auto.items-center
-      .mr-5 APP ID: {{ app.app.alias }}
+      .mr-5 APP alias: {{ app.app.alias }}
       button(class="mr-8 hover:text-teal-500" @click="$modal.show('changeAppId')") 修改
 
   table.table-auto.mt-10
@@ -32,7 +32,7 @@
         td.border.px-4.py-2.text-center {{ version.pacakgeCount }}
         td.border.px-4.py-2.text-center {{ version.updatedAt | formatTime }}
         td.border.px-4.py-2.text-center
-          a(class="text-blue-500 hover:text-blue-800" :href="`/version/${ version.id }`") 预览
+          a(class="text-blue-500 hover:text-blue-800" :href="`/${app.app.alias}/version/${ version.id }`") 预览
           button(class="hover:text-teal-500" @click="() => setDefaultVersion(version.id)") 设为默认版本
           button(class="ml-3 hover:text-teal-500" @click="() => onDeleteVersion(version.id)") 删除
 
