@@ -88,7 +88,7 @@ func isValidPackageName(name string) bool {
 //     - [version.version]
 //       - [id].ipa/apk
 func savePackage(file io.Reader, pkg *Package, info *parser.AppInfo) error {
-	dir := path.Join(config.RootDir, info.Platform, info.BundleID, info.FullVersion())
+	dir := path.Join(config.RootDir, info.Platform, info.BundleID, getFullVersion(info))
 
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		return errors.Wrap(err, "mkdir error")

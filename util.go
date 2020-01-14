@@ -5,6 +5,8 @@ import (
 	"math/rand"
 	"os"
 	"time"
+
+	"cjting.me/apphub/parser"
 )
 
 // work around sqlite3 error: can't scan string into time.Time
@@ -65,4 +67,14 @@ func randomStr(n int) string {
 func fileExists(path string) bool {
 	_, err := os.Stat(path)
 	return !os.IsNotExist(err)
+}
+
+// for ios: this is `$short_version.$bundle_version`, e.g. "1.2.3.4"
+// for android: this is $VersionName
+func getFullVersion(a *parser.AppInfo) string {
+	if a.Platform == "ios" {
+		return fmt.Sprintf("%s.%s", a.IOSShortVersion, a.IOSBundleVersion)
+	}
+
+	return a.AndroidVersionName
 }

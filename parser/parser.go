@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"encoding/xml"
 	"errors"
-	"fmt"
 	"image"
 	"image/png"
 	"io"
@@ -43,16 +42,6 @@ type AppInfo struct {
 	// empty if android
 	IOSShortVersion  string
 	IOSBundleVersion string
-}
-
-// for ios: this is `$short_version($bundle_version)`, e.g. "1.2.3(4)"
-// for android: this is $VersionName
-func (a *AppInfo) FullVersion() string {
-	if a.Platform == ios {
-		return fmt.Sprintf("%s(%s)", a.IOSShortVersion, a.IOSBundleVersion)
-	}
-
-	return a.AndroidVersionName
 }
 
 type androidManifest struct {

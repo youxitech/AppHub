@@ -76,12 +76,12 @@ func (db *DB) createPackage(
 		err := db.Get(
 			version,
 			`select * from version where version = $1 and app_id = $2`,
-			info.FullVersion(),
+			getFullVersion(info),
 			app.ID,
 		)
 		if err == sql.ErrNoRows {
 			// create version
-			version.Version = info.FullVersion()
+			version.Version = getFullVersion(info)
 			version.AppID = app.ID
 			version.AndroidVersionName = info.AndroidVersionName
 			version.AndroidVersionCode = info.AndroidVersionCode
