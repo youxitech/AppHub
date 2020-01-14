@@ -52,5 +52,5 @@ bundle: build-ui build-darwin build-linux
 .PHONY: bundle
 
 deploy:
-	rsync --progress tmp/*linux systatic:/data/apphub/
+	rsync --update --progress tmp/*linux systatic:/data/apphub/
 	ssh systatic systemctl restart apphub
