@@ -115,13 +115,15 @@ func (db *DB) createPackage(
 	pkg.Size = info.Size
 	pkg.CreatedAt = time.Now()
 	pkg.Remark = pkgRemark
+	pkg.IOSPackageType = info.IOSPackageType
+	pkg.IOSDeviceList = info.IOSDeviceList
 
 	if _, err := db.NamedExec(`
 		insert into package(
-			id, version_id, name, size, created_at, remark
+			id, version_id, name, size, created_at, remark, ios_package_type, ios_device_list
 		)
 		values(
-			:id, :version_id, :name, :size, :created_at, :remark
+			:id, :version_id, :name, :size, :created_at, :remark, :ios_package_type, :ios_device_list
 		)
 			`, pkg); err != nil {
 		return nil, nil, nil, errors.Wrap(err, "could not insert package")

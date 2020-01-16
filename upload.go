@@ -42,6 +42,10 @@ func handleUpload(ctx iris.Context) {
 		panicErr(err)
 	}
 
+	if appInfo.IOSPackageType == "dev" {
+		panic400("iOS 不支持上传开发包")
+	}
+
 	// calc md5
 	buf, err := ioutil.ReadAll(file)
 	if err != nil {

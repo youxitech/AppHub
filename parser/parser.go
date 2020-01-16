@@ -10,6 +10,8 @@ import (
 	"image/png"
 	"io"
 	"io/ioutil"
+	"os"
+	"path"
 	"regexp"
 	"strings"
 
@@ -20,12 +22,22 @@ import (
 )
 
 const ios = "ios"
+
+// ios package type
+const pkgTypeDev = "dev"
+const pkgTypeAdHoc = "ad-hoc"
+const pkgTypeInHouse = "in-house"
+const pkgTypeAppStore = "app-store"
+
 const android = "android"
 
 var (
-	reInfoPlist      = regexp.MustCompile(`Payload/[^/]+/Info\.plist`)
-	ErrNoIcon        = errors.New("icon not found")
-	ErrUnsupportFile = errors.New("unsupport file")
+	reInfoPlist         = regexp.MustCompile(`Payload/[^/]+/Info\.plist`)
+	reEmbeddedProvision = regexp.MustCompile(`Payload/[^/]+/embedded\.mobileprovision`)
+	reSpace             = regexp.MustCompile(`\s`)
+	reDeviceUDID        = regexp.MustCompile(`<string>(.+?)</string>`)
+	ErrNoIcon           = errors.New("icon not found")
+	ErrUnsupportFile    = errors.New("unsupport file")
 )
 
 type AppInfo struct {
@@ -42,6 +54,8 @@ type AppInfo struct {
 	// empty if android
 	IOSShortVersion  string
 	IOSBundleVersion string
+	IOSPackageType   string
+	IOSDeviceList    []string // list of UDIDs
 }
 
 type androidManifest struct {
@@ -58,27 +72,45 @@ type iosPlist struct {
 	CFBundleIdentifier   string `plist:"CFBundleIdentifier"`
 }
 
-func Parse(fileName string, file io.ReaderAt, size int64) (*AppInfo, error) {
+func ParseFile(p string) (*AppInfo, error) {
+	f, err := os.Open(p)
+	if err != nil {
+		return nil, err
+	}
+
+	info, err := f.Stat()
+	if err != nil {
+		return nil, err
+	}
+
+	return Parse(path.Base(p), f, info.Size())
+}
+
+func Parse(fileName string, reader io.ReaderAt, size int64) (*AppInfo, error) {
 	if strings.HasSuffix(fileName, ".ipa") {
-		return ParseIpa(file, size)
+		return ParseIpa(reader, size)
 	} else if strings.HasSuffix(fileName, ".apk") {
-		return ParseApk(file, size)
+		return ParseApk(reader, size)
 	}
 
 	return nil, ErrUnsupportFile
 }
 
-func ParseIpa(file io.ReaderAt, size int64) (*AppInfo, error) {
-	reader, err := zip.NewReader(file, size)
+func ParseIpa(r io.ReaderAt, size int64) (*AppInfo, error) {
+	reader, err := zip.NewReader(r, size)
 	if err != nil {
 		return nil, err
 	}
 
-	var plistFile, iosIconFile *zip.File
+	var plistFile, iosIconFile, provisionFile *zip.File
 	for _, f := range reader.File {
 		switch {
 		case reInfoPlist.MatchString(f.Name):
 			plistFile = f
+
+		case reEmbeddedProvision.MatchString(f.Name):
+			provisionFile = f
+
 		case strings.Contains(f.Name, "AppIcon60x60"):
 			iosIconFile = f
 		}
@@ -86,7 +118,7 @@ func ParseIpa(file io.ReaderAt, size int64) (*AppInfo, error) {
 
 	info := &AppInfo{}
 	info.Platform = ios
-	plist, err := parseIosPlist(plistFile)
+	plist, err := parseIOSPlist(plistFile)
 
 	if err != nil {
 		return nil, err
@@ -101,11 +133,69 @@ func ParseIpa(file io.ReaderAt, size int64) (*AppInfo, error) {
 	info.IOSShortVersion = plist.CFBundleShortVersion
 	info.IOSBundleVersion = plist.CFBundleVersion
 
+	pkgType, deviceList, err := parseIOSProvision(provisionFile)
+	if err != nil {
+		return nil, err
+	}
+	info.IOSPackageType = pkgType
+	info.IOSDeviceList = deviceList
+
 	icon, err := parseIpaIcon(iosIconFile)
 	info.Icon = icon
 	info.Size = size
 
 	return info, err
+}
+
+// return value: pacakgeType, deviceList, error
+func parseIOSProvision(file *zip.File) (string, []string, error) {
+	if file == nil {
+		return "", nil, errors.New("embedded.mobileprovision not found")
+	}
+
+	rc, err := file.Open()
+	if err != nil {
+		return "", nil, err
+	}
+	defer rc.Close()
+
+	buf, err := ioutil.ReadAll(rc)
+	if err != nil {
+		return "", nil, err
+	}
+
+	// remove all the spaces
+	buf = reSpace.ReplaceAll(buf, nil)
+
+	// dev
+	if bytes.Contains(buf, []byte("<key>get-task-allow</key><true/>")) {
+		return pkgTypeDev, nil, nil
+	}
+
+	// in-house
+	if bytes.Contains(buf, []byte("<key>ProvisionsAllDevices</key>")) {
+		return pkgTypeInHouse, nil, nil
+	}
+
+	// ad-hoc
+	if i := bytes.Index(buf, []byte("<key>ProvisionedDevices</key>")); i != -1 {
+		j := bytes.Index(buf[i:], []byte("</array>"))
+
+		// should never happen
+		if j == -1 {
+			return "", nil, errors.New("invalid embedded.mobileprovision file")
+		}
+
+		content := string(buf[i : i+j])
+		var deviceList []string
+		for _, l := range reDeviceUDID.FindAllStringSubmatch(content, -1) {
+			deviceList = append(deviceList, l[1])
+		}
+		return pkgTypeAdHoc, deviceList, nil
+	}
+
+	// app store
+	return pkgTypeAppStore, nil, nil
 }
 
 func ParseApk(file io.ReaderAt, size int64) (*AppInfo, error) {
@@ -188,7 +278,7 @@ func parseApkIconAndLabel(reader io.ReaderAt, size int64) (image.Image, string, 
 	return icon, label, nil
 }
 
-func parseIosPlist(plistFile *zip.File) (*iosPlist, error) {
+func parseIOSPlist(plistFile *zip.File) (*iosPlist, error) {
 	if plistFile == nil {
 		return nil, errors.New("info.plist not found")
 	}

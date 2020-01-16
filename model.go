@@ -1,6 +1,11 @@
 package main
 
-import "time"
+import (
+	"database/sql/driver"
+	"errors"
+	"strings"
+	"time"
+)
 
 /*----------  Corresponding to Database Views or Tables ----------*/
 type SimpleApp struct {
@@ -36,12 +41,29 @@ type DetailVersion struct {
 	UpdatedAt    MyTime `json:"updatedAt" db:"updated_at"`
 }
 
+type stringList []string
+
+func (s *stringList) Scan(src interface{}) error {
+	if str, ok := src.(string); ok {
+		*s = strings.Split(str, "|")
+		return nil
+	}
+
+	return errors.New("invalid type for ios_device_list")
+}
+
+func (s stringList) Value() (driver.Value, error) {
+	return strings.Join(s, "|"), nil
+}
+
 type Package struct {
-	ID            string    `db:"id" json:"id"`
-	VersionID     int       `db:"version_id" json:"versionID"`
-	DownloadCount int       `db:"download_count" json:"downloadCount"`
-	Name          string    `db:"name" json:"name"`
-	Size          int64     `db:"size" json:"size"`
-	CreatedAt     time.Time `db:"created_at" json:"createdAt"`
-	Remark        string    `db:"remark" json:"remark"`
+	ID             string     `db:"id" json:"id"`
+	VersionID      int        `db:"version_id" json:"versionID"`
+	DownloadCount  int        `db:"download_count" json:"downloadCount"`
+	Name           string     `db:"name" json:"name"`
+	Size           int64      `db:"size" json:"size"`
+	CreatedAt      time.Time  `db:"created_at" json:"createdAt"`
+	Remark         string     `db:"remark" json:"remark"`
+	IOSPackageType string     `db:"ios_package_type" json:"iosPackageType"`
+	IOSDeviceList  stringList `db:"ios_device_list" json:"iosDeviceList"`
 }

@@ -4,11 +4,11 @@ note:
 - ngnix client_max_body_size
 
 functions:
-- figure out ios package tyep: ad-hoc, appstore, etc..
-- get device count when ad-hoc
 - preview could be protected by a password
 - download all packages of a version in zip 
 
+- get device count when ad-hoc
+- figure out ios package tyep: ad-hoc, appstore, etc..
 - parse ipa, apk to get a verison
   - name
   - version
