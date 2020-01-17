@@ -2,7 +2,8 @@
 -- +migrate Up
 -- valid value: 'ad-hoc', 'in-house', 'app-store'
 alter table package
-  add column ios_package_type text not null default 'ad-hoc' check(ios_package_type = 'ad-hoc' or ios_package_type = 'in-house' or ios_package_type = 'app-store')
+  add column ios_package_type text not null default 'ad-hoc'
+    check(ios_package_type = '' or ios_package_type = 'ad-hoc' or ios_package_type = 'in-house' or ios_package_type = 'app-store')
 ;
 
 -- only valid if pacakge type is ad-hoc
