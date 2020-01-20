@@ -66,4 +66,5 @@ type Package struct {
 	Remark         string     `db:"remark" json:"remark"`
 	IOSPackageType string     `db:"ios_package_type" json:"iosPackageType"`
 	IOSDeviceList  stringList `db:"ios_device_list" json:"iosDeviceList"`
+	Channel        string     `db:"channel" json:"channel"`
 }

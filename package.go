@@ -117,3 +117,71 @@ func handleGetPlist(ctx iris.Context) {
 
 	plistTemp.Execute(ctx.ResponseWriter(), payload)
 }
+
+func handleUpdatePackageChannel(ctx iris.Context) {
+	payload := &struct {
+		Channel string `json:"channel"`
+	}{}
+
+	if err := ctx.ReadJSON(payload); err != nil {
+		panic400("bad json payload: %v", err)
+	}
+
+	pkgID := ctx.Params().Get("id")
+
+	if _, err := db.Exec("update package set channel = $1 where id = $2", payload.Channel, pkgID); err != nil {
+		panic(err)
+	}
+}
+
+// response:
+//	app: App
+//	packages: [{}]
+//		version: Version
+//		package: Package
+func handleGetChannel(ctx iris.Context) {
+	res := iris.Map{
+		"app":     nil,
+		"content": emptyArray,
+	}
+
+	app := db.getAppByAliasOrID(ctx.Params().Get("alias"))
+
+	if app == nil {
+		ctx.NotFound()
+		return
+	}
+	res["app"] = app
+
+	var pkgs []*Package
+
+	channel := ctx.Params().Get("channel")
+
+	if err := db.Select(
+		&pkgs,
+		`
+			select
+				pkg.*
+			from
+				package pkg left join version v on pkg.version_id = v.id
+			where
+				pkg.channel = $1
+		`,
+		channel,
+	); err != nil {
+		panic(err)
+	}
+
+	var content []iris.Map
+
+	for _, pkg := range pkgs {
+		ver := db.getVersion(pkg.VersionID)
+		content = append(content, iris.Map{
+			"package": pkg,
+			"version": ver,
+		})
+	}
+
+	res["content"] = content
+	ctx.JSON(res)
+}

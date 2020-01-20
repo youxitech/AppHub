@@ -17,12 +17,14 @@ import (
 
 // form params:
 //	file:
-//  versionRemark:
-//	packageRemark:
+//  versionRemark: String
+//	packageRemark: String
+//	channel: String default to `android` for android, `ios` for ios
 func handleUpload(ctx iris.Context) {
 	file, info, err := ctx.FormFile("file")
 	versionRemark := ctx.PostValue("versionRemark")
 	pkgRemark := ctx.PostValue("packageRemark")
+	channel := ctx.PostValue("channel")
 
 	if err != nil {
 		panic400("could not get uploaded file: %v", err)
@@ -61,8 +63,12 @@ func handleUpload(ctx iris.Context) {
 		panic400("Package 已存在")
 	}
 
+	if channel == "" {
+		channel = appInfo.Platform
+	}
+
 	// create package
-	app, version, pkg, err := db.createPackage(appInfo, fileName, versionRemark, pkgRemark, md5)
+	app, version, pkg, err := db.createPackage(appInfo, fileName, versionRemark, pkgRemark, md5, channel)
 	if err != nil {
 		panicErr(err)
 	}

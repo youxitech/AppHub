@@ -1,15 +1,7 @@
 
 -- +migrate Up
--- valid value: 'ad-hoc', 'in-house', 'app-store'
 alter table package
-  add column ios_package_type text not null default 'ad-hoc'
-    check(ios_package_type = '' or ios_package_type = 'ad-hoc' or ios_package_type = 'in-house' or ios_package_type = 'app-store')
-;
-
--- only valid if pacakge type is ad-hoc
--- `|` separated udids
-alter table package
-  add column ios_device_list text not null default ''
+  add column channel text not null default 'android'
 ;
 
 -- +migrate Down
@@ -22,13 +14,16 @@ create table package2(
   name string not null unique,
   size int not null,
   created_at datetime not null,
-  remark text not null default ''
+  remark text not null default '',
+  ios_package_type text not null default 'ad-hoc'
+    check(ios_package_type = '' or ios_package_type = 'ad-hoc' or ios_package_type = 'in-house' or ios_package_type = 'app-store'),
+  ios_device_list text not null default ''
 );
 
 insert into
-  package2(id, version_id, download_count , name, size, created_at, remark)
+  package2(id, version_id, download_count , name, size, created_at, remark, ios_package_type, ios_device_list)
 select
-  id, version_id, download_count , name, size, created_at, remark
+  id, version_id, download_count , name, size, created_at, remark, ios_package_type, ios_device_list
 from
   package;
 

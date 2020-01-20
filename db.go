@@ -48,7 +48,7 @@ func (db *DB) getPackage(id string) *Package {
 
 func (db *DB) createPackage(
 	info *parser.AppInfo, fileName, versionRemark, pkgRemark string,
-	pkgID string,
+	pkgID, channel string,
 ) (*App, *Version, *Package, error) {
 	// fetch app
 	app := &App{}
@@ -117,13 +117,14 @@ func (db *DB) createPackage(
 	pkg.Remark = pkgRemark
 	pkg.IOSPackageType = info.IOSPackageType
 	pkg.IOSDeviceList = info.IOSDeviceList
+	pkg.Channel = channel
 
 	if _, err := db.NamedExec(`
 		insert into package(
-			id, version_id, name, size, created_at, remark, ios_package_type, ios_device_list
+			id, version_id, name, size, created_at, remark, ios_package_type, ios_device_list, channel
 		)
 		values(
-			:id, :version_id, :name, :size, :created_at, :remark, :ios_package_type, :ios_device_list
+			:id, :version_id, :name, :size, :created_at, :remark, :ios_package_type, :ios_device_list, :channel
 		)
 			`, pkg); err != nil {
 		return nil, nil, nil, errors.Wrap(err, "could not insert package")

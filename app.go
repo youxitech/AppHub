@@ -58,7 +58,7 @@ func handleGetApps(ctx iris.Context) {
 	ctx.JSON(apps)
 }
 
-func handleSetAppAlias(ctx iris.Context) {
+func handleUpdateAppAlias(ctx iris.Context) {
 	payload := &struct {
 		Alias string `json:"alias"`
 	}{}

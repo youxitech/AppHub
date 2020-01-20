@@ -39,35 +39,40 @@ func serveUIFile(ctx iris.Context, p string) {
 }
 
 func mounteRoute(app *iris.Application) {
-	// handle ui requests, static/ui is the root dir
-	app.Get("*", func(ctx iris.Context) {
-		path := ctx.Request().URL.Path
+	{
+		// handle ui requests, static/ui is the root dir
+		app.Get("*", func(ctx iris.Context) {
+			path := ctx.Request().URL.Path
 
-		// index.html
-		if path == "/" {
-			serveUIFile(ctx, "index.html")
-			return
-		}
+			// index.html
+			if path == "/" {
+				serveUIFile(ctx, "index.html")
+				return
+			}
 
-		// try files
-		serveUIFile(ctx, path)
-	})
+			// try files
+			serveUIFile(ctx, path)
+		})
 
-	// data files
-	app.Get("/data/*", func(ctx iris.Context) {
-		parts := strings.Split(ctx.Path(), "/")
+		// data files
+		app.Get("/data/*", func(ctx iris.Context) {
+			parts := strings.Split(ctx.Path(), "/")
 
-		p := path.Join(append([]string{config.RootDir}, parts[2:]...)...)
+			p := path.Join(append([]string{config.RootDir}, parts[2:]...)...)
 
-		if !fileExists(p) {
-			ctx.StatusCode(404)
-			return
-		}
+			if !fileExists(p) {
+				ctx.StatusCode(404)
+				return
+			}
 
-		ctx.ServeFile(p, false)
-	})
+			ctx.ServeFile(p, false)
+		})
+	}
 
 	r := app.Party("/api")
+	r.Any("*", func(ctx iris.Context) {
+		ctx.NotFound()
+	})
 
 	// no need to auth
 	{
@@ -75,11 +80,13 @@ func mounteRoute(app *iris.Application) {
 
 		r.Post("/login", handleLogin)
 
-		r.Get("/:alias", handleGetAppByAlias)
+		r.Get("/apps/:alias", handleGetAppByAlias)
 
-		r.Get("/:alias/:version", handleGetVersion)
+		r.Get("/apps/:alias/:version", handleGetVersion)
 
 		r.Get("/packages/:id", handleGetPackage)
+
+		r.Get("/apps/:alias/channels/:channel", handleGetChannel)
 
 		r.Get("/plist/:pkgID", handleGetPlist)
 	}
@@ -97,7 +104,10 @@ func mounteRoute(app *iris.Application) {
 		r.Delete("/apps/:id", handleDeleteApp)
 
 		// alias: string
-		r.Patch("/apps/:id", handleSetAppAlias)
+		r.Patch("/apps/:id", handleUpdateAppAlias)
+
+		// channel: string
+		r.Patch("/packages/:id", handleUpdatePackageChannel)
 
 		r.Post("/versions/{id:int}/active", handleSetActiveVersion)
 
