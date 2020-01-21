@@ -1,30 +1,51 @@
 <template lang="pug">
-.admin-version
-  version(
-    :key="key"
-    :id="$route.params.version"
-    :alias="$route.params.alias"
-  )
+.admin-version.text-center(v-if="version != null")
+  .text-3xl
+    span {{ app && app.app.name }}
+    router-link.text-blue-500(
+      class="hover:underline"
+      :to="`/${ $route.params.id }/${ $route.params.version }`"
+      target="_blank"
+    ) {{ version.version.version}}
+  .text-sm.mt-2.text-gray-600 bundleID: {{ app && app.app.bundleID }}
+  pkg-list(
+    :pkgs="version.packages.map(item => ({...item, version: version.version.version }))"
+    )
 </template>
 
 <script>
-import Version from "./version"
+import PkgList from "pkg-list"
 
 export default {
   data() {
     return {
-      key: 0,
+      version: null,
     }
   },
 
-  watch: {
-    $route() {
-      this.key = this.$route.query.t
+  computed: {
+    app() {
+      return this.$store.state.app
+    },
+  },
+
+  mounted() {
+    this.$store.dispatch("getAppInfo", this.$route.params.id)
+    this.fetchVersion()
+  },
+
+  methods: {
+    fetchVersion() {
+      axios.get(`/apps/${ this.$route.params.id }/${ this.$route.params.version }`)
+        .then(res => {
+          this.version = res.data
+        })
+        .catch(_displayError)
     },
   },
 
   components: {
-    Version,
+    PkgList,
   },
 }
 </script>

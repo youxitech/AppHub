@@ -13,6 +13,8 @@
       "_util",
       "_global",
       "_displayError",
+      "_showErr",
+      "_showSuccess",
       "__API_ENV__",
       "_showConfirm",
       "_db"

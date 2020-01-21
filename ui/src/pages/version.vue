@@ -1,31 +1,21 @@
 <template lang="pug">
-.h-screen(v-if="version")
-  .p-10.text-3xl {{ version.version.version }}
-  .flex.justify-center
-    table.table-auto
-      thead
-        tr
-          th.px-4.py-2 包名
-          th.px-4.py-2 创建时间
-          th.px-4.py-2 大小
-          th.px-4.py-2 下载次数
-          th.px-4.py-2 二维码
-      tbody
-        tr(
-          v-for="pkg of version.packages"
-          :key="pkg.id"
-        )
-          td.border.px-4.py-2.text-center
-            a(class="text-blue-500 hover:text-blue-800" :href="`/pkg/${pkg.id}`") {{ pkg.name }}
-          td.border.px-4.py-2.text-center {{ pkg.createdAt | formatTime }}
-          td.border.px-4.py-2.text-center {{ pkg.size | bytesToSize }}
-          td.border.px-4.py-2.text-center {{ pkg.downloadCount }}
-          td.border.px-4.py-2.text-center
-            img(:src="pkg.qrcode")
+.text-center.flex-1(
+  :class="{ 'mt-8': isDetail }"
+)
+  template(v-if="version != null")
+    router-link.text-3xl.text-blue-500(
+      v-if="!isDetail"
+      :to="'/' + alias + '/' + id"
+      class="hover:underline"
+    ) {{ version.version.version }}
+    .text-3xl(v-else) {{ app && app.app.name }} {{ version.version.version}}
+    .text-sm.mt-2.text-gray-600(v-if="isDetail") bundleID: {{ app && app.app.bundleID }}
+
+    pkg-list(:pkgs="version.packages.map(item => ({...item, version: version.version.version }))")
 </template>
 
 <script>
-import QRCode from "qrcode"
+import PkgList from "pkg-list"
 
 export default {
   props: {
@@ -38,6 +28,11 @@ export default {
       type: String,
       default: "",
     },
+
+    isDetail: {
+      type: Boolean,
+      default: true,
+    },
   },
 
   data() {
@@ -46,31 +41,52 @@ export default {
     }
   },
 
+  computed: {
+    app() {
+      return this.$store.state.app
+    },
+  },
+
   mounted() {
+    this.$store.dispatch("getAppInfo", this.$route.params.id)
+
+    if(this.id == null) return
+
     this.fetchVersion()
+  },
+
+  watch: {
+    id() {
+      if(this.id == null) return
+
+      this.version = null
+      this.fetchVersion()
+    },
   },
 
   methods: {
     fetchVersion() {
-      axios.get(`/${ this.alias || this.$route.params.id }/${ this.id || this.$route.params.version }`)
+      axios.get(`/apps/${ this.alias || this.$route.params.id }/${ this.id || this.$route.params.version }`)
         .then(res => {
           this.version = res.data
-          Promise.all(this.version.packages.map(pkg => QRCode.toDataURL(location.host + `/pkg/${ pkg.id }`)))
-            .then(res => {
-              this.version.packages = this.version.packages.map((item, index) => {
-                return {
-                  qrcode: res[index],
-                  ...item,
-                }
-              })
-            })
         })
         .catch(_displayError)
     },
+  },
+
+  components: {
+    PkgList,
   },
 }
 </script>
 
 <style lang="stylus">
+.version__hover:hover
+  transform: scale(2)
+  transition: 0.5s
 
+.version__modal
+  padding: 12px
+  background: white
+  height: 400px !important
 </style>

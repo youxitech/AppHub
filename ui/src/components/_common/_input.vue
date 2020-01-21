@@ -1,5 +1,6 @@
 <template lang="pug">
 input._input(
+  ref="input"
   class="bg-white focus:outline-none focus:shadow-outline border border-gray-300 rounded-lg py-2 px-4 block w-full appearance-none leading-normal"
   :type="type"
   :placeholder="placeholder"
@@ -25,6 +26,16 @@ export default {
     placeholder: {
       type: String,
       default: "",
+    },
+  },
+
+  methods: {
+    focus() {
+      this.$refs.input.focus()
+    },
+
+    blur() {
+      this.$refs.input.blur()
     },
   },
 }

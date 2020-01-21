@@ -9,11 +9,12 @@ import AdminVersion from "@/admin-version"
 import Pkg from "@/pkg"
 import Version from "@/version"
 import App from "@/app"
+import Channel from "@/channel"
 import NotFound from "@/404"
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   mode: "history",
   routes: [
     // admin
@@ -53,8 +54,14 @@ export default new Router({
       component: App,
     },
     {
+      path: "/:id/channel/:channel",
+      component: Channel,
+    },
+    {
       path: "*",
       component: NotFound,
     },
   ],
 })
+
+export default router

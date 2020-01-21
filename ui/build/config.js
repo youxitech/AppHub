@@ -1,5 +1,5 @@
 module.exports = {
-  port: 8880,
+  port: 9200,
   proxyTable: {
     "!(/api)**/v*.*": {
       target: 'http://localhost:8880/',

@@ -1,4 +1,5 @@
 import Vue from "vue"
+import QRCode from "qrcode"
 
 // type: bundle | icon
 // platform: ios | android
@@ -17,6 +18,20 @@ export const getAsset = (type, platform, bundleId, versionId, pkgId) => {
   }
 }
 
+export const showSuccess = text => {
+  Vue.notify({
+    type: "success",
+    text,
+  })
+}
+
+export const showErr = text => {
+  Vue.notify({
+    type: "error",
+    text,
+  })
+}
+
 export const displayError = e => {
   console.error(e)
   let text
@@ -26,8 +41,7 @@ export const displayError = e => {
     text = "Some error occurred"
   }
 
-  Vue.notify({
-    type: "error",
-    text,
-  })
+  showErr(text)
 }
+
+export const idToQRCode = id => QRCode.toDataURL(location.host + `/pkg/${ id }`)
