@@ -68,16 +68,19 @@ export default {
 
       uppy
         .on("file-added", file => {
+          let channel = ""
           const { name } = file
           const nameArr = name.split(".")
           nameArr.splice(nameArr.length - 1, 1)
           const fileName = nameArr.join(".")
           const fileNameArr = fileName.split("-")
-          if(fileNameArr.length === 3) {
-            uppy.setFileMeta(file.id, {
-              channel: fileNameArr[2],
-            })
+          if(fileNameArr.length === 3 && fileNameArr[1] === "prod") {
+            channel = fileNameArr[2]
           }
+
+          uppy.setFileMeta(file.id, {
+            channel,
+          })
         })
         .use(Dashboard, { trigger: ".uploader-trigger" })
         .use(XHRUpload, {
