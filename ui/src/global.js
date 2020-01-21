@@ -15,6 +15,8 @@ import "tailwindcss/tailwind.css"
 window.axios = axios
 window._util = util
 window._displayError = util.displayError
+window._showErr = util.showErr
+window._showSuccess = util.showSuccess
 window._db = db
 window._global = {
   isDev: location.port !== "",

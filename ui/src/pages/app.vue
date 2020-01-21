@@ -1,47 +1,51 @@
 <template lang="pug">
-.flex-1.bg-gray-200.p-6(v-if="app")
-  .rounded.overflow-hidden.shadow-lg.p-6.flex.flex-col.bg-white.h-full
-    .flex
-      img.w-24.h-24.mr-2.rounded(:src="_getAsset('icon', app.app.platform, app.app.bundleID)")
-      .ml-5
-        .font-semibold {{ app.app.name }}
-        .text-sm.text-gray-600.mt-3 Platform: {{ app.app.platform }}
-        .text-sm.text-gray-600 BundleID: {{ app.app.bundleID }}
-        .text-sm.text-gray-600 Download: {{ app.app.downloadCount }}
-      .flex.ml-auto.items-center APP alias: {{ app.app.alias }}
+.flex-1.bg-gray-200.p-6.h-screen(v-if="app")
+  app-info(:app="app.app")
 
-  version(
-    :id="String(app.versions[0].version)"
-    :alias="app.app.alias"
-  )
+  .flex.py-8
+    .w-40.bg-white.rounded.shadow-lg.h-auto.overflow-auto.self-start
+      .h-10.flex.items-center.justify-center.border-gray-200.border-solid.border-b.cursor-pointer(
+        v-for="item in app.versions"
+        :key="item.id"
+        :class="{ 'bg-blue-400 text-white': item.version === curVersion }"
+        @click="curVersion = item.version"
+      ) {{ item.version }}
+
+    version(
+      :id="curVersion"
+      :alias="app.app.alias"
+      :isDetail="false"
+    )
 </template>
 
 <script>
 import Version from "./version"
+import AppInfo from "app-info"
 
 export default {
   data() {
     return {
-      app: null,
+      curVersion: null,
     }
   },
 
-  mounted() {
-    this.fetchApp()
+  computed: {
+    app() {
+      return this.$store.state.app
+    },
   },
 
-  methods: {
-    fetchApp() {
-      return axios.get(`/${ this.$route.params.id }`)
-        .then(res => {
-          this.app = res.data
-        })
-        .catch(_displayError)
-    },
+
+  mounted() {
+    this.$store.dispatch("getAppInfo", this.$route.params.id)
+      .then(() => {
+        this.curVersion = this.app && this.app.versions[0].version
+      })
   },
 
   components: {
     Version,
+    AppInfo,
   },
 }
 </script>

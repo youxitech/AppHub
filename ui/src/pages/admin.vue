@@ -64,12 +64,27 @@ export default {
     },
 
     initUploader() {
-      Uppy({ autoProceed: true })
+      const uppy = Uppy({ autoProceed: true })
+
+      uppy
+        .on("file-added", file => {
+          const { name } = file
+          const nameArr = name.split(".")
+          nameArr.splice(nameArr.length - 1, 1)
+          const fileName = nameArr.join(".")
+          const fileNameArr = fileName.split("-")
+          if(fileNameArr.length === 3) {
+            uppy.setFileMeta(file.id, {
+              channel: fileNameArr[2],
+            })
+          }
+        })
         .use(Dashboard, { trigger: ".uploader-trigger" })
         .use(XHRUpload, {
           endpoint: "/api/admin/upload",
           formData: true,
           fieldName: "file",
+          metaFields: ["channel"],
           headers: {
             "X-Admin-Token": _db.token,
           },
@@ -77,18 +92,12 @@ export default {
         .on("complete", res => {
           if(res.failed.length > 0) {
             res.failed.forEach(item => {
-              this.$notify({
-                type: "error",
-                text: `文件${ item.name }失败，原因：${ item.response.body.msg }`,
-              })
+              _showSuccess(`文件${ item.name }失败，原因：${ item.response.body.msg }`)
             })
             return
           }
 
-          this.$notify({
-            type: "success",
-            text: "全部上传成功",
-          })
+          _showSuccess("全部上传成功")
           this.$router.push("/admin")
         })
     },
