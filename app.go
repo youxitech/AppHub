@@ -67,6 +67,10 @@ func handleUpdateAppAlias(ctx iris.Context) {
 		panic400("bad json payload: %v", err)
 	}
 
+	if payload.Alias == "" {
+		panic400("alias should not be empty")
+	}
+
 	appID, _ := ctx.Params().GetIntUnslashed("id")
 
 	if _, err := db.Exec("update app set alias = $1 where id = $2", payload.Alias, appID); err != nil {
