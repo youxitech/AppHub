@@ -166,6 +166,7 @@ func handleGetChannel(ctx iris.Context) {
 				package pkg left join version v on pkg.version_id = v.id
 			where
 				pkg.channel = $1
+			order by created_at desc
 		`,
 		channel,
 	); err != nil {

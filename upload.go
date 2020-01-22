@@ -63,8 +63,11 @@ func handleUpload(ctx iris.Context) {
 		panic400("Package 已存在")
 	}
 
-	if channel == "" {
-		channel = appInfo.Platform
+	// fix channel for ios
+	if appInfo.Platform == "ios" {
+		channel = "ios"
+	} else if channel == "" {
+		channel = "none"
 	}
 
 	// create package
