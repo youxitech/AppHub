@@ -24,7 +24,7 @@
     "@uppy/core": "1.7.1",
     "@uppy/dashboard": "1.5.2",
     "@uppy/xhr-upload": "1.4.2",
-    "axios": "0.18.0",
+    "axios": "0.18.1",
     "date-fns": "2.9.0",
     "qrcode": "1.4.4",
     "qs": "6.7.0",
