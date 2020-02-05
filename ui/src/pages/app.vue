@@ -35,7 +35,6 @@ export default {
     },
   },
 
-
   mounted() {
     this.$store.dispatch("getAppInfo", this.$route.params.id)
       .then(() => {
