@@ -60,7 +60,7 @@
       )
       .flex.mt-10
         button.mr-10(class="mr-8 hover:text-teal-500" @click="changeAppId") Confirm
-        button(class="mr-8 hover:text-teal-500" @click="$modal.hide('hangeAppId')") Cancel
+        button(class="mr-8 hover:text-teal-500" @click="$modal.hide('changeAppId')") Cancel
 </template>
 
 <script>
@@ -68,26 +68,29 @@ export default {
   data() {
     return {
       newAppId: "",
+      app: null,
     }
   },
 
-  computed: {
-    app() {
-      return this.$store.state.app
-    },
-  },
-
   mounted() {
-    this.$store.dispatch("getAppInfo", this.$route.params.id)
+    this.fetchApp()
   },
 
   watch: {
     $route() {
-      this.$store.dispatch("getAppInfo", this.$route.params.id)
+      this.fetchApp()
     },
   },
 
   methods: {
+    fetchApp() {
+      return axios.get(`/admin/apps/${ this.$route.params.id }`)
+        .then(res => {
+          this.app = res.data
+        })
+        .catch(_displayError)
+    },
+
     setDefaultVersion(id) {
       axios.post(`/admin/versions/${ id }/active`)
         .then(res => {

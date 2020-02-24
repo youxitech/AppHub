@@ -3,21 +3,22 @@ import Router from "vue-router"
 import db from "db"
 
 import Login from "@/login"
-import Admin from "@/admin"
-import AdminApp from "@/admin-app"
-import AdminVersion from "@/admin-version"
+import NotFound from "@/404"
+
+import Admin from "@/admin/index"
+import AdminApp from "@/admin/app"
+import AdminVersion from "@/admin/version"
+
 import Pkg from "@/pkg"
 import Version from "@/version"
 import App from "@/app"
 import Channel from "@/channel"
-import NotFound from "@/404"
 
 Vue.use(Router)
 
 const router = new Router({
   mode: "history",
   routes: [
-    // admin
     {
       path: "/",
       redirect: () => db.token ? "/admin" : "/login",
@@ -40,7 +41,7 @@ const router = new Router({
         },
       ],
     },
-    // customer
+    // customer view
     {
       path: "/pkg/:id",
       component: Pkg,

@@ -56,7 +56,7 @@ export default {
       axios.get("/admin/apps")
         .then(res => {
           this.apps = res.data
-          // 已选 app 或 没有 app 列表直接返回
+          // query 参数已有 id 或 还没有上传 app 就不用跳转到第一项
           if(this.$route.params.id || this.apps.length === 0) return
           this.$router.push(`/admin/${ this.apps[0].alias }`)
         })
@@ -95,8 +95,9 @@ export default {
         .on("complete", res => {
           if(res.failed.length > 0) {
             res.failed.forEach(item => {
-              _showSuccess(`文件${ item.name }失败，原因：${ item.response.body.msg }`)
+              _showErr(`文件${ item.name }失败，原因：${ item.response.body.msg }`)
             })
+            this.$router.push("/admin")
             return
           }
 

@@ -44,4 +44,4 @@ export const displayError = e => {
   showErr(text)
 }
 
-export const idToQRCode = id => QRCode.toDataURL(location.host + `/pkg/${ id }`)
+export const idToQRCode = id => QRCode.toDataURL(location.protocol + location.host + `/pkg/${ id }`)
