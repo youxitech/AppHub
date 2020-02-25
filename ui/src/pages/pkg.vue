@@ -1,22 +1,38 @@
 <template lang="pug">
-.pkg.w-screen.h-screen.flex.justify-center.items-center(v-if="pkg")
-  .mr-48
-    img.w-24.h-24.rounded(:src="_getAsset('icon', pkg.app.platform, pkg.app.bundleID)")
-    .mt-5.text-2xl {{ pkg.app.name }}
-    .mt-3.leading-loose.text-gray-500.text-sm
-      p 版本: {{ pkg.version.version }} 大小: {{ pkg.package.size | bytesToSize }}
-      p 发布日期: {{ pkg.package.createdAt | formatTime }}
-  .pkg__qrcode
-    img.mt-16.w-40.h-40.ml-6(:src="this.qrcode")
-    .mt-12.ml-6.text-gray-500 请扫描二维码下载APP
-    .ml-6.text-gray-500 适用于 {{ pkg.app.platform }} 系统
-    _button.ml-6(v-if="global.isIos" @click="install") 安装
-    a.ml-6(
-      v-else
-      :href="_getAsset('bundle', pkg.app.platform, pkg.app.bundleID, pkg.version.version, pkg.package.id)"
-      :download="pkg.package.name"
-    )
-      _button 下载
+.pkg.h-screen(v-if="pkg")
+  .pkg__main.flex.items-center.justify-center.flex-col
+    .flex.items-center.justify-center
+      img.rounded(
+        :src="_getAsset('icon', pkg.app.platform, pkg.app.bundleID)"
+        style="height: 44px; width: 44px;"
+      )
+      div(style="font-size: 32px; margin-left: 20px") {{ pkg.app.name }}
+
+    .pkg__card.mt-5.flex
+      .pkg__card--lg.pr-12(class="hidden lg:flex items-center justify-center flex-col")
+        img(:src="this.qrcode" style="width: 128px; height: 128px")
+        a(
+          :href="_getAsset('bundle', pkg.app.platform, pkg.app.bundleID, pkg.version.version, pkg.package.id)"
+          :download="pkg.package.name"
+        )
+          _button.w-40.mt-6 下载
+
+      div(class="lg:ml-12")
+        p.mb-2.font-bold(style="font-size: 24px") {{ pkg.app.platform }}
+        p.mb-2.font-bold(style="font-size: 16px") {{ pkg.package.name }}
+        p 版本: {{ pkg.version.version }}
+        p 渠道: {{ pkg.package.channel }}
+        p 时间: {{ pkg.package.createdAt | formatTime }}
+        p 大小: {{ pkg.package.size | bytesToSize }}
+        _button.w-full.mt-6(v-if="global.isIos" class="lg:hidden" @click="install") 安装
+        a(
+          v-else
+          :href="_getAsset('bundle', pkg.app.platform, pkg.app.bundleID, pkg.version.version, pkg.package.id)"
+          :download="pkg.package.name"
+          class="lg:hidden"
+        )
+          _button.w-full.mt-6 下载
+  _copyright
 </template>
 
 <script>
@@ -60,16 +76,20 @@ export default {
 
 <style lang="stylus">
 .pkg
-  background-image: url("/static/pkg-bg.png")
-  background-size: cover
+  background: $background
 
-.pkg__qrcode
-  background-image: url("/static/phone.png")
-  background-size: cover
-  width 300px
-  height 450px
+.pkg__main
+  height: calc(100vh - 80px)
 
-@media (max-width: 640px)
-  .pkg
-    flex-direction: column
+.pkg__card
+  background: #fff
+  box-shadow: 0px 1px 1px 0px rgba(16,22,26,0.2),0px 0px 0px 1px rgba(16,22,26,0.1)
+  border-radius: 28px
+  padding: 50px
+  p
+    margin-bottom: 10px
+    color: $text-gray
+
+.pkg__card--lg
+  border-right: 1px solid $border
 </style>

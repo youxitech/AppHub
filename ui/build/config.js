@@ -9,11 +9,11 @@ module.exports = {
     },
     "/api": {
       changeOrigin: true,
-      target: "http://debug.haibao6688.com",
+      target: "https://apphub.haibao6688.com",
     },
     "/data": {
       changeOrigin: true,
-      target: "http://debug.haibao6688.com",
+      target: "https://apphub.haibao6688.com",
     },
   },
 }

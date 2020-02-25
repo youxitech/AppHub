@@ -40,9 +40,3 @@ export default {
   },
 }
 </script>
-
-<style type="text/css">
-</style>
-
-<style lang="stylus">
-</style>
