@@ -1,6 +1,10 @@
 SHELL := /bin/bash
 GO_FLAGS := -ldflags="-X 'main.appVersion=$$(git tag --points-at HEAD)' -X 'main.appHash=$$(git rev-parse --short HEAD)'"
 
+install:
+	go install -v $(GO_FLAGS)
+.PHONY: install
+
 run: install
 	apphub -d tmp/debug.sqlite3 -r tmp/data --host test.com
 .PHONY: run
@@ -8,10 +12,6 @@ run: install
 rundev:
 	apphub -p 3389 -d tmp/debug.sqlite3 -r tmp/data --host test.com
 .PHONY: rundev
-
-install:
-	go install -v $(GO_FLAGS)
-.PHONY: install
 
 bindata:
 	go-bindata -debug -prefix static static/...
