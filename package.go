@@ -52,6 +52,26 @@ var plistTemp = template.Must(template.New("plist").Parse(`
 </plist>
 `))
 
+// query params:
+//	version_id: version id, int empty means all
+//	env: string empty means all
+//	channel: string empty means all
+func handleGetPackages(ctx iris.Context) {
+	versionID, err := ctx.URLParamInt("version_id")
+	if err != nil {
+		versionID = -1
+	}
+	env := ctx.URLParam("env")
+	channel := ctx.URLParam("channel")
+
+	pkgs, err := db.getPackages(versionID, env, channel)
+	if err != nil {
+		panic(err)
+	}
+
+	ctx.JSON(pkgs)
+}
+
 // always return 200 even if package doesn't exist
 // TODO: delete version if no package belongs to that version
 func handleDeletePackage(ctx iris.Context) {

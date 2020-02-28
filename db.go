@@ -200,7 +200,6 @@ func (db *DB) getAppByAliasOrID(value interface{}) *SimpleApp {
 	return app
 }
 
-// App: id, name
 func (db *DB) getApps() ([]*SimpleApp, error) {
 	apps := make([]*SimpleApp, 0)
 
@@ -209,6 +208,57 @@ func (db *DB) getApps() ([]*SimpleApp, error) {
 	}
 
 	return apps, nil
+}
+
+// return all envs of packages of this app
+func (db *DB) getAppEnvs(appID int) ([]string, error) {
+	result := make([]string, 0)
+
+	if err := db.Select(&result, `
+		select 
+			distinct env 
+		from 
+			package p 
+			left join version v 
+			on p.version_id = v.id where v.app_id = $1; 
+	`, appID); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// return all channels of packages of this app
+func (db *DB) getAppChannels(appID int) ([]string, error) {
+	result := make([]string, 0)
+
+	if err := db.Select(&result, `
+		select 
+			distinct channel 
+		from 
+			package p 
+			left join version v 
+			on p.version_id = v.id where v.app_id = $1; 
+	`, appID); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func (db *DB) getAppAlias(platform, bundleID string) (string, error) {
+	var result []string
+	if err := db.Select(&result, `
+		select alias from app where platform = $1 and bundle_id = $2
+	`, platform, bundleID); err != nil {
+		return "", err
+	}
+
+	if len(result) == 0 {
+		return "", nil
+	}
+
+	return result[0], nil
 }
 
 // sort by sort_key desc
@@ -262,6 +312,38 @@ func (db *DB) getVersionByAppAliasAndFullVersion(appAlias, fullVersion string) *
 	}
 
 	return ver
+}
+
+// -1/"" means all
+func (db *DB) getPackages(versionID int, env string, channel string) ([]*Package, error) {
+	pkgs := make([]*Package, 0)
+	sql := `select * from package where true`
+	var params []interface{}
+	n := 1
+
+	if versionID != -1 {
+		sql += fmt.Sprintf(` and version_id = $%d`, n)
+		params = append(params, versionID)
+		n += 1
+	}
+
+	if env != "" {
+		sql += fmt.Sprintf(` and env = $%d`, n)
+		params = append(params, env)
+		n += 1
+	}
+
+	if channel != "" {
+		sql += fmt.Sprintf(` and channel = $%d`, n)
+		params = append(params, channel)
+		n += 1
+	}
+
+	if err := db.Select(&pkgs, sql, params...); err != nil {
+		return nil, err
+	}
+
+	return pkgs, nil
 }
 
 // sort by created_at desc

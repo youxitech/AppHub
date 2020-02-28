@@ -67,4 +67,5 @@ type Package struct {
 	IOSPackageType string     `db:"ios_package_type" json:"iosPackageType"`
 	IOSDeviceList  stringList `db:"ios_device_list" json:"iosDeviceList"`
 	Channel        string     `db:"channel" json:"channel"`
+	Env            string     `db:"env" json:"env"`
 }

@@ -4,17 +4,17 @@ import (
 	"github.com/kataras/iris"
 )
 
-// path params:
-//	id: string
 // res:
 //	app: SimpleApp
+//	hasIOS: bool
+//	hasAndroid: bool
 //	versions: [DetailVersion]
-//	packages: [Package] packages of current versions
+//	envs: [String]
+//	channels: [String]
 func handleGetAppByAlias(ctx iris.Context) {
 	res := iris.Map{
 		"app":      nil,
 		"versions": emptyArray,
-		"packages": emptyArray,
 	}
 
 	app := db.getAppByAliasOrID(ctx.Params().Get("alias"))
@@ -29,19 +29,39 @@ func handleGetAppByAlias(ctx iris.Context) {
 	if err != nil {
 		panic(err)
 	}
-
-	if len(versions) == 0 {
-		ctx.JSON(res)
-		return
-	}
-
 	res["versions"] = versions
 
-	pkgs, err := db.getVersionPackages(versions[0].ID)
+	envs, err := db.getAppEnvs(app.ID)
 	if err != nil {
 		panic(err)
 	}
-	res["packages"] = pkgs
+	res["envs"] = envs
+
+	channels, err := db.getAppChannels(app.ID)
+	if err != nil {
+		panic(err)
+	}
+	res["channels"] = channels
+
+	var otherPlatform string
+	if app.Platform == "ios" {
+		otherPlatform = "android"
+	} else {
+		otherPlatform = "ios"
+	}
+
+	otherAppAlias, err := db.getAppAlias(otherPlatform, app.BundleID)
+	if err != nil {
+		panic(err)
+	}
+
+	if app.Platform == "ios" {
+		res["iosAlias"] = app.Alias
+		res["androidAlias"] = otherAppAlias
+	} else {
+		res["hasAndroid"] = app.Alias
+		res["hasIOS"] = otherAppAlias
+	}
 
 	ctx.JSON(res)
 }

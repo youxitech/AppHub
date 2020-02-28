@@ -74,13 +74,15 @@ func mounteRoute(app *iris.Application) {
 		ctx.NotFound()
 	})
 
-	// no need to auth
+	// public
 	{
 		r := r.Party("/")
 
 		r.Post("/login", handleLogin)
 
 		r.Get("/apps/:alias", handleGetAppByAlias)
+
+		r.Get("/apps/:alias/packages", handleGetPackages)
 
 		r.Get("/apps/:alias/:version", handleGetVersion)
 
@@ -91,7 +93,7 @@ func mounteRoute(app *iris.Application) {
 		r.Get("/plist/:pkgID", handleGetPlist)
 	}
 
-	// need to auth
+	// admin
 	{
 		r := r.Party("/admin")
 

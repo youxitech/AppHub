@@ -1,7 +1,7 @@
 
 -- +migrate Up
 alter table package
-  add column channel text not null default '-'，
+  add column env text not null default '-'
 ;
 
 -- +migrate Down
@@ -17,13 +17,14 @@ create table package2(
   remark text not null default '',
   ios_package_type text not null default 'ad-hoc'
     check(ios_package_type = '' or ios_package_type = 'ad-hoc' or ios_package_type = 'in-house' or ios_package_type = 'app-store'),
-  ios_device_list text not null default ''
+  ios_device_list text not null default '',
+  channel not null
 );
 
 insert into
-  package2(id, version_id, download_count , name, size, created_at, remark, ios_package_type, ios_device_list)
+  package2(id, version_id, download_count , name, size, created_at, remark, ios_package_type, ios_device_list, channel)
 select
-  id, version_id, download_count , name, size, created_at, remark, ios_package_type, ios_device_list
+  id, version_id, download_count , name, size, created_at, remark, ios_package_type, ios_device_list, channel
 from
   package;
 
