@@ -1,10 +1,13 @@
 module.exports = {
   port: 9200,
   proxyTable: {
-    "!(/api)**/v*.*": {
-      target: 'http://localhost:8880/',
+    "**/v*.*": {
+      target: 'http://192.168.10.88:3389/',
+      changeOrigin: true,
       router: function (req) {
-        req.url = "index.html"
+        if(!req.url.startsWith("/api")) {
+          req.url = "http://localhost:9200/index.html"
+        }
       }
     },
     "/api": {

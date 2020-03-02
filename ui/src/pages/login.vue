@@ -1,16 +1,14 @@
 <template lang="pug">
 .h-screen.bg-gray-100.flex.justify-center.items-center
-  div(class="sm:focus-within:shadow-outline rounded-lg")
-    div(class="max-w-sm sm:flex sm:shadow sm:rounded-lg sm:overflow-hidden")
-      _input(
-        class="shadow sm:shadow-none block w-full rounded-lg focus:border-teal-500 border border-transparent sm:rounded-r-none mb-4 sm:mb-0 text-black sm:flex-1 px-6 py-4 lg:py-5 focus:outline-none"
+  div(class="focus-within:shadow-outline rounded-lg")
+    div.max-w-sm.flex.shadow.rounded-lg.overflow-hidden
+      _input.login__input(
         type="email"
         v-model="token"
         placeholder="Enter your token"
         @enter="login"
       )
-      button(
-        class="text-sm shadow sm:shadow-none block w-full sm:w-auto rounded-lg sm:rounded-none focus:outline-none bg-teal-500 hover:bg-teal-500-dark focus:bg-teal-500-dark text-white text-shadow uppercase tracking-wide font-semibold px-6 py-4 lg:py-5"
+      button.login__btn(
         @click="login"
       ) Login
 </template>
@@ -39,4 +37,22 @@ export default {
 </script>
 
 <style lang="stylus">
+.login__btn
+  @apply text-sm block bg-teal-500 text-white \
+    uppercase tracking-wide font-semibold \
+    px-6 py-4 w-auto rounded-none shadow-none
+
+.login__btn:focus
+  @apply outline-none bg-teal-400
+
+.login__btn:hover
+  @apply bg-teal-400
+
+.login__input
+  @apply shadow-none block w-full rounded-lg border \
+    border-transparent rounded-r-none mb-0 \
+    text-black flex-1 px-6 py-4
+
+.login__input:focus
+  @apply border-teal-500 outline-none
 </style>
