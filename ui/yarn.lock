@@ -612,14 +612,6 @@
     "@babel/helper-create-regexp-features-plugin" "^7.8.3"
     "@babel/helper-plugin-utils" "^7.8.3"
 
-"@babel/polyfill@7.8.3":
-  version "7.8.3"
-  resolved "https://registry.npm.taobao.org/@babel/polyfill/download/@babel/polyfill-7.8.3.tgz#2333fc2144a542a7c07da39502ceeeb3abe4debd"
-  integrity sha1-IzP8IUSlQqfAfaOVAs7us6vk3r0=
-  dependencies:
-    core-js "^2.6.5"
-    regenerator-runtime "^0.13.2"
-
 "@babel/preset-env@7.8.4":
   version "7.8.4"
   resolved "https://registry.npm.taobao.org/@babel/preset-env/download/@babel/preset-env-7.8.4.tgz#9dac6df5f423015d3d49b6e9e5fa3413e4a72c4e"
@@ -741,6 +733,11 @@
     eslint-plugin-vue "5.2.3"
     eslint-plugin-vue-types "1.0.1"
     standard-engine "11.0.1"
+
+"@popperjs/core@^2.1.0":
+  version "2.1.0"
+  resolved "https://registry.npmjs.org/@popperjs/core/-/core-2.1.0.tgz#09a7a352a40508156e1256efdc015593feca28e0"
+  integrity sha512-ntN5t5spqhQv28cLfmmt1dYabsudzR5A7PU15gr/gzcT/gzqAOnYFQPaLPFraDa7ZCJG2eJ1JsO7pgXbYXGIrw==
 
 "@types/babel-types@*", "@types/babel-types@^7.0.0":
   version "7.0.7"
@@ -2174,7 +2171,12 @@ core-js-compat@^3.6.2:
     browserslist "^4.8.3"
     semver "7.0.0"
 
-core-js@^2.4.0, core-js@^2.6.5:
+core-js@3.6.4:
+  version "3.6.4"
+  resolved "https://registry.npmjs.org/core-js/-/core-js-3.6.4.tgz#440a83536b458114b9cb2ac1580ba377dc470647"
+  integrity sha512-4paDGScNgZP2IXXilaffL9X7968RuvwlkK3xWtZRVqgd8SYNiVKRJvkFd1aqqEuPfN7E68ZHEp9hDj6lHj4Hyw==
+
+core-js@^2.4.0:
   version "2.6.11"
   resolved "https://registry.npm.taobao.org/core-js/download/core-js-2.6.11.tgz#38831469f9922bded8ee21c9dc46985e0399308c"
   integrity sha1-OIMUafmSK97Y7iHJ3EaYXgOZMIw=
@@ -2933,9 +2935,9 @@ eslint-plugin-standard@4.0.0:
   integrity sha1-+EW0UQnJnNkOd3lpQKNEVGyPa1w=
 
 eslint-plugin-vue-types@1.0.1:
-  version "1.0.0"
-  resolved "https://registry.npm.taobao.org/eslint-plugin-vue-types/download/eslint-plugin-vue-types-1.0.0.tgz#cfe7d618689df57dee9ce570749e65a98d069837"
-  integrity sha1-z+fWGGid9X3unOVwdJ5lqY0GmDc=
+  version "1.0.1"
+  resolved "https://registry.npmjs.org/eslint-plugin-vue-types/-/eslint-plugin-vue-types-1.0.1.tgz#e44659b6afe7a3c741b506c582e8f2a43d8c46d6"
+  integrity sha512-quZgpxy7dOhvltPkplcX82YLJ0ThgP1KaboIwl+RZSnK/JI2CxWhv0/sFcAeZlpaynsFULjkXKKxlWVxsFjgkw==
   dependencies:
     eslint-rule-composer "^0.3.0"
 
@@ -7189,6 +7191,13 @@ timsort@^0.3.0:
   version "0.3.0"
   resolved "https://registry.npm.taobao.org/timsort/download/timsort-0.3.0.tgz#405411a8e7e6339fe64db9a234de11dc31e02bd4"
   integrity sha1-QFQRqOfmM5/mTbmiNN4R3DHgK9Q=
+
+tippy.js@6.0.1:
+  version "6.0.1"
+  resolved "https://registry.npmjs.org/tippy.js/-/tippy.js-6.0.1.tgz#8556e9a94c99059e6ccde6f0c92fd880195e73ab"
+  integrity sha512-b69hYyVLRcgo1H8NQ6MrBYnxp0YzznuRhUfefGdYTLYlsYTznIXCpN0ym0hCwnB8CcSItOOustPbY2A/aRfbkw==
+  dependencies:
+    "@popperjs/core" "^2.1.0"
 
 tmp@^0.0.33:
   version "0.0.33"

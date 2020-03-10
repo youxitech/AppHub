@@ -1,4 +1,4 @@
-import "@babel/polyfill"
+import "core-js/stable"
 import axios from "axios"
 import * as util from "util"
 import Vue from "vue"
