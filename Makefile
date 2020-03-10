@@ -48,7 +48,7 @@ build-linux:
 	make bindata
 .PHONY: build-linux
 
-bundle: build-ui build-darwin build-linux
+bundle: build-ui build-linux
 .PHONY: bundle
 
 deploy:
