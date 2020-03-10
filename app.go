@@ -59,8 +59,8 @@ func handleGetAppByAlias(ctx iris.Context) {
 		res["iosAlias"] = app.Alias
 		res["androidAlias"] = otherAppAlias
 	} else {
-		res["hasAndroid"] = app.Alias
-		res["hasIOS"] = otherAppAlias
+		res["androidAlias"] = app.Alias
+		res["iosAlias"] = otherAppAlias
 	}
 
 	ctx.JSON(res)

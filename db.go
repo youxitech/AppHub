@@ -315,26 +315,42 @@ func (db *DB) getVersionByAppAliasAndFullVersion(appAlias, fullVersion string) *
 }
 
 // -1/"" means all
-func (db *DB) getPackages(versionID int, env string, channel string) ([]*Package, error) {
+func (db *DB) getPackages(
+	appAlias string,
+	versionID int,
+	env string,
+	channel string,
+) ([]*Package, error) {
 	pkgs := make([]*Package, 0)
-	sql := `select * from package where true`
+	sql := `
+		select 
+			p.* 
+		from package p 
+			left join version v
+				on p.version_id = v.id
+			left join app a
+				on v.app_id = a.id
+		where
+			a.alias = $1
+	`
 	var params []interface{}
-	n := 1
+	params = append(params, appAlias)
+	n := 2
 
 	if versionID != -1 {
-		sql += fmt.Sprintf(` and version_id = $%d`, n)
+		sql += fmt.Sprintf(` and v.id = $%d`, n)
 		params = append(params, versionID)
 		n += 1
 	}
 
 	if env != "" {
-		sql += fmt.Sprintf(` and env = $%d`, n)
+		sql += fmt.Sprintf(` and p.env = $%d`, n)
 		params = append(params, env)
 		n += 1
 	}
 
 	if channel != "" {
-		sql += fmt.Sprintf(` and channel = $%d`, n)
+		sql += fmt.Sprintf(` and p.channel = $%d`, n)
 		params = append(params, channel)
 		n += 1
 	}

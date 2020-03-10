@@ -53,18 +53,18 @@ var plistTemp = template.Must(template.New("plist").Parse(`
 `))
 
 // query params:
-//	version_id: version id, int empty means all
+//	versionID: version id, int empty means all
 //	env: string empty means all
 //	channel: string empty means all
 func handleGetPackages(ctx iris.Context) {
-	versionID, err := ctx.URLParamInt("version_id")
+	versionID, err := ctx.URLParamInt("versionID")
 	if err != nil {
 		versionID = -1
 	}
 	env := ctx.URLParam("env")
 	channel := ctx.URLParam("channel")
 
-	pkgs, err := db.getPackages(versionID, env, channel)
+	pkgs, err := db.getPackages(ctx.Params().Get("alias"), versionID, env, channel)
 	if err != nil {
 		panic(err)
 	}

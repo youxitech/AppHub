@@ -80,17 +80,17 @@ func mounteRoute(app *iris.Application) {
 
 		r.Post("/login", handleLogin)
 
-		r.Get("/apps/:alias", handleGetAppByAlias)
+		r.Get("/apps/{alias:string}", handleGetAppByAlias)
 
-		r.Get("/apps/:alias/packages", handleGetPackages)
+		r.Get("/apps/{alias:string}/packages", handleGetPackages)
 
-		r.Get("/apps/:alias/:version", handleGetVersion)
+		r.Get("/apps/{alias:string}/{version:string}", handleGetVersion)
 
-		r.Get("/packages/:id", handleGetPackage)
+		r.Get("/packages/{id:string}", handleGetPackage)
 
-		r.Get("/apps/:alias/channels/:channel", handleGetChannel)
+		r.Get("/apps/:alias/channels/{channel:string}", handleGetChannel)
 
-		r.Get("/plist/:pkgID", handleGetPlist)
+		r.Get("/plist/{pkgID:string}", handleGetPlist)
 	}
 
 	// admin
@@ -101,15 +101,15 @@ func mounteRoute(app *iris.Application) {
 
 		r.Get("/apps", handleGetApps)
 
-		r.Get("/apps/:alias", handleGetAppByAlias)
+		r.Get("/apps/{alias:string}", handleGetAppByAlias)
 
-		r.Delete("/apps/:id", handleDeleteApp)
+		r.Delete("/apps/{id:int}", handleDeleteApp)
 
 		// alias: string
-		r.Patch("/apps/:id", handleUpdateAppAlias)
+		r.Patch("/apps/{id:int}", handleUpdateAppAlias)
 
 		// channel: string
-		r.Patch("/packages/:id", handleUpdatePackageChannel)
+		r.Patch("/packages/{id:string}", handleUpdatePackageChannel)
 
 		r.Post("/versions/{id:int}/active", handleSetActiveVersion)
 
