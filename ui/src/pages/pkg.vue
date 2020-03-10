@@ -1,7 +1,5 @@
 <template lang="pug">
-.pkg(
-  v-if="pkg"
-)
+.pkg(v-if="pkg")
   .pkg__top
     .pkg__top-main
       img.pkg__top-img(
@@ -35,13 +33,13 @@
   .pkg__footer
     .pkg__footer-text
       span Powered by
-      a.text-blue-600(
+      a.pkg__footer-link(
         href="https://www.youxishequ.com"
         target="_blank"
       ) &nbsp;Youxishequ.com
     .pkg__footer-text
       span Fork us on
-      a.text-blue-600(
+      a.pkg__footer-link(
         href="https://github.com/youxitech/AppHub"
         target="_blank"
       ) &nbsp;Github
@@ -182,6 +180,9 @@ export default {
   text-align: center
   color: $neutral-7
   font-size: 14px
+
+.pkg__footer-link
+  color: $info-6
 
 @media only screen and (min-width: 640px)
   .pkg__top

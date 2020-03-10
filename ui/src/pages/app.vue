@@ -21,8 +21,8 @@
   .app__body
     .app__main
       .app__top
-        span.text-2xl.mr-4 {{ PLATFORM[app.app.platform] }}
-        span.text-sm.text-gray-600 {{ app.app.bundleID }}
+        span.app__platform {{ PLATFORM[app.app.platform] }}
+        span.app__bundle {{ app.app.bundleID }}
 
       .app__filter
         .app__label 发布环境：
@@ -64,7 +64,7 @@
           .app__pkg-body
             .app__pkg-info
               div 创建时间：{{ item.createdAt | formatTime }}
-              div 大小：{{ item.size | bytesToSize }} MB
+              div 大小：{{ item.size | bytesToSize }}
 
             .app__tag-wrap
               .app__tag {{ item.version }}
@@ -290,6 +290,10 @@ export default {
   margin-right: 80px
   color: $neutral-9
   font-size: 14px
+  line-height: 1
+
+.app__pkg-info > div:last-child
+  margin-top: 10px
 
 .app__pkg-body
   margin-top: 10px
@@ -339,25 +343,47 @@ export default {
   cursor: pointer
 
 .app__version-text:hover
-  @apply underline text-blue-400
+  text-decoration: underline
+  color: $info-6
 
 .app__filter
-  @apply flex
+  display: flex
 
 .app__label
-  @apply text-sm text-gray-700 flex-shrink-0
+  color: $neutral-10
+  font-size: 14px
+  flex-shrink: 0
 
 .app__options
-  @apply flex flex-wrap
+  display: flex
+  flex-wrap: wrap
 
 .app__option
-  @apply text-sm text-gray-500 px-4 h-6 mx-4 mb-4 cursor-pointer
+  font-size: 14px
+  color: $neutral-7
+  padding: 0 16px
+  height: 24px
+  margin: 0 16px 16px
+  display: flex
+  align-items: center
+  cursor: pointer
 
 .app__option--selected
-  @apply text-blue-600 bg-blue-200 rounded-sm
+  background: $info-2
+  color: $info-6
+  border-radius: 4px
+  font-weight: bold
 
 .app__tag
-  @apply bg-gray-200 text-sm text-gray-600 h-6 px-2 rounded-sm flex items-center inline-block
+  background: $neutral-2
+  font-size: 14px
+  color: $neutral-9
+  height: 30px
+  padding: 0 14px
+  border-radius: 3px
+  display: inline-flex
+  align-items: center
+  justify-content: center
 
 .app__right
   width: 80px
