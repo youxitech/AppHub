@@ -1,22 +1,23 @@
 <template lang="pug">
 .app(v-if="app")
   .app__header
-    img.app__header-img(
-      :src="_getAsset('icon', app.app.platform, app.app.bundleID)"
-    )
-    .app__header-name {{ app.app.name }}
+    .app__header-wrap
+      img.app__header-img(
+        :src="_getAsset('icon', app.app.platform, app.app.bundleID)"
+      )
+      .app__header-name {{ app.app.name }}
 
-    .app__tabs
-      .app__tab(
-        v-if="app.iosAlias !== ''"
-        :class="{ 'app__tab--active': app.app.platform === 'ios' }"
-        @click="$router.replace(`/${ app.iosAlias }`)"
-      ) iOS
-      .app__tab(
-        v-if="app.androidAlias !== ''"
-        :class="{ 'app__tab--active': app.app.platform === 'android' }"
-        @click="$router.replace(`/${ app.androidAlias }`)"
-      ) Android
+      .app__tabs
+        .app__tab(
+          v-if="app.iosAlias !== ''"
+          :class="{ 'app__tab--active': app.app.platform === 'ios' }"
+          @click="$router.replace(`/${ app.iosAlias }`)"
+        ) iOS
+        .app__tab(
+          v-if="app.androidAlias !== ''"
+          :class="{ 'app__tab--active': app.app.platform === 'android' }"
+          @click="$router.replace(`/${ app.androidAlias }`)"
+        ) Android
 
   .app__body
     .app__main
@@ -29,13 +30,13 @@
         .app__options
           .app__option(
             :class="{ 'app__option--selected': curEnv == null }"
-            @click="curEnv = null, getApp()"
+            @click="setEnv(null)"
           ) 全部
           .app__option(
             v-for="item in app.envs"
             :key="item"
             :class="{ 'app__option--selected': curEnv === item }"
-            @click="curEnv = item, getApp()"
+            @click="setEnv(item)"
           ) {{ item }}
 
       .app__filter
@@ -43,16 +44,21 @@
         .app__options
           .app__option(
             :class="{ 'app__option--selected': curChannel == null }"
-            @click="curChannel = null, getApp()"
+            @click="setChannel(null)"
           ) 全部
           .app__option(
             v-for="item in app.channels"
             :key="item"
             :class="{ 'app__option--selected': curChannel === item }"
-            @click="curChannel = item, getApp()"
+            @click="setChannel(item)"
           ) {{ item }}
 
       .app__pkg-list
+        .app__pkg--none(v-if="pkgs.length === 0 && !isLoading")
+          img.app__pkg-img--none(src="/static/pkg-none.png")
+          .app__pkg-text--none 没有可用的安装包
+          .app__pkg-text--none 更改一下筛选条件吧
+
         .app__pkg(
           v-for="item in pkgs"
           :key="item.id"
@@ -67,11 +73,13 @@
               div 大小：{{ item.size | bytesToSize }}
 
             .app__tag-wrap
-              .app__tag {{ item.version }}
+              .app__tag(
+                @click="setVersion(app.versions.find(version => version.version === item.version).id)"
+              ) {{ item.version }}
             .app__tag-wrap
-              .app__tag {{ item.env }}
+              .app__tag(@click="setEnv(item.env)") {{ item.env }}
             .app__tag-wrap
-              .app__tag {{ item.channel }}
+              .app__tag(@click="setChannel(item.channel)") {{ item.channel }}
 
             .app__qrcode-wrap(ref="popper")
               img.app__qrcode(
@@ -92,7 +100,7 @@
     .app__right
       .app__version(
         :class="{ 'app__version--active': null === curVersion }"
-        @click="curVersion = null, getApp()"
+        @click="setVersion(null)"
       )
         .app__version-text 全部
         .app__round(v-if="null === curVersion")
@@ -100,7 +108,7 @@
         v-for="version in app.versions"
         :key="version.id"
         :class="{ 'app__version--active': version.id === curVersion }"
-        @click="curVersion = version.id, getApp()"
+        @click="setVersion(version.id)"
       )
         .app__version-text {{ version.version }}
         .app__round(v-if="version.id === curVersion")
@@ -124,6 +132,7 @@ export default {
       curChannel: null,
       curVersion: null,
       pkgs: [],
+      isLoading: false,
       PLATFORM,
     }
   },
@@ -136,15 +145,19 @@ export default {
 
   beforeRouteUpdate(to, from, next) {
     next()
-    this.curEnv = null
-    this.curChannel = null
-    this.curVersion = null
+    this.curEnv = this.$route.query.env || null
+    this.curChannel = this.$route.query.channel || null
+    this.curVersion = Number(this.$route.query.version) || null
     this.pkgs = []
     this.$store.dispatch("getAppInfo", this.$route.params.id)
       .then(() => this.getApp())
   },
 
   mounted() {
+    this.curEnv = this.$route.query.env || null
+    this.curChannel = this.$route.query.channel || null
+    this.curVersion = Number(this.$route.query.version) || null
+
     this.$store.dispatch("getAppInfo", this.$route.params.id)
       .then(() => this.getApp())
   },
@@ -165,6 +178,8 @@ export default {
       this.pkgs.forEach(item => {
         item.tippyInstance.destroy()
       })
+      this.pkgs = []
+      this.isLoading = true
 
       axios.get(`/apps/${ this.$route.params.id }/packages`, { params })
         .then(res => {
@@ -189,8 +204,45 @@ export default {
                 })
               })
           })
+          this.isLoading = false
         })
         .catch(_displayError)
+    },
+
+    setEnv(env) {
+      this.curEnv = env
+      this.$router.replace({
+        path: this.$route.path,
+        query: {
+          ...this.$route.query,
+          env,
+        },
+      })
+      this.getApp()
+    },
+
+    setChannel(channel) {
+      this.curChannel = channel
+      this.$router.replace({
+        path: this.$route.path,
+        query: {
+          ...this.$route.query,
+          channel,
+        },
+      })
+      this.getApp()
+    },
+
+    setVersion(version) {
+      this.curVersion = version
+      this.$router.replace({
+        path: this.$route.path,
+        query: {
+          ...this.$route.query,
+          version,
+        },
+      })
+      this.getApp()
     },
   },
 }
@@ -199,18 +251,29 @@ export default {
 <style lang="stylus">
 .app
   height: 100vh
+  width: 100vw
   flex: 1
   flex-direction: column
   display: flex
+  background: $neutral-1
+  overflow: auto
+  overflow-x: auto
 
 .app__header
-  display: flex
   height: 64px
   background: white
-  padding: 0 40px
-  align-items: center
   border-bottom: 1px solid rgba(16, 22, 26, 0.2)
   box-shadow: 0 2px 6px 0 rgba(16, 22, 26, 0.2)
+  padding: 0 40px
+  min-width: 1380px
+  box-sizing: content-box
+
+.app__header-wrap
+  height: 100%
+  display: flex
+  align-items: center
+  width: 1380px
+  margin: 0 auto
 
 .app__header-img
   width: 32px
@@ -241,10 +304,12 @@ export default {
   font-weight: bold
 
 .app__body
-  background: $neutral-1
   display: flex
   flex: 1
   padding: 0 40px
+  width: 1380px
+  margin: 0 auto
+  box-sizing: content-box
 
 .app__main
   flex: 1
@@ -276,7 +341,8 @@ export default {
   padding: 20px 20px 30px
   margin-bottom: 20px
   border: 1px solid rgba(16, 22, 26, 0.2)
-  max-width: 900px
+  max-width: 958px
+  box-sizing: border-box
 
 .app__pkg-name
   font-size: 16px
@@ -286,7 +352,7 @@ export default {
 
 .app__pkg-info
   width: 240px
-  margin-right: 80px
+  margin-right: 100px
   color: $neutral-9
   font-size: 14px
   line-height: 1
@@ -383,14 +449,15 @@ export default {
   display: inline-flex
   align-items: center
   justify-content: center
+  cursor: pointer
 
 .app__right
-  width: 80px
+  width: 250px
   padding: 8px 0
   border-left: 2px solid $neutral-3
   margin-top: 68px
   align-self: start
-  margin-right: 220px
+  box-sizing: border-box
 
 .app__version
   height: 22px
@@ -405,4 +472,20 @@ export default {
 .app__version--active
   color: $info-6
   font-weight: bold
+
+.app__pkg--none
+  height: 400px
+  display: flex
+  flex-direction: column
+  justify-content: center
+  align-items: center
+
+.app__pkg-text--none
+  color: $neutral-6
+  font-size: 14px
+  line-height: 20px
+  margin-top: 10px
+
+.app__pkg-text--none:last-child
+  margin-top: 0
 </style>

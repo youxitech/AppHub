@@ -165,8 +165,6 @@ export default {
   font-weight: bold
 
 .pkg__footer
-  background: $neutral-2
-  padding-top: 6vh
   margin-top: auto
   height: 12vh
   box-sizing: content-box
