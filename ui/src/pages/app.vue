@@ -174,7 +174,6 @@ export default {
               .find(version => version.id === item.versionID)
               .version,
           }))
-          this.pkgs = this.pkgs.concat(this.pkgs)
         })
         .then(() => {
           this.pkgs.map((pkg, index) => {
