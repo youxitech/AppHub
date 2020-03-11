@@ -33,7 +33,7 @@
         v-else
         :href="_getAsset('bundle', pkg.app.platform, pkg.app.bundleID, pkg.version.version, pkg.package.id)"
       )
-        button 下载
+        button 安装
 
   .pkg__footer
     .pkg__footer-text
