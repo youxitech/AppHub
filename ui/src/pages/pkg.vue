@@ -26,14 +26,14 @@
       .pkg__info 时间：{{ pkg.package.createdAt | formatTime }}
       .pkg__info 大小：{{ pkg.package.size | bytesToSize }}
       button.pkg__mobile-ios-btn(
-        v-if="global.isIos"
+        v-if="global.isIos && pkg.app.platform === 'ios'"
         @click="install"
       ) 安装
       a.pkg__mobile-btn-wrap(
         v-else
         :href="_getAsset('bundle', pkg.app.platform, pkg.app.bundleID, pkg.version.version, pkg.package.id)"
       )
-        button 安装
+        button {{ !global.isIos && pkg.app.platform === "android" ? "安装" : "下载" }}
 
   .pkg__footer
     .pkg__footer-text
