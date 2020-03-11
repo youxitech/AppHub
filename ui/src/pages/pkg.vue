@@ -25,7 +25,12 @@
       .pkg__info 渠道：{{ pkg.package.channel }}
       .pkg__info 时间：{{ pkg.package.createdAt | formatTime }}
       .pkg__info 大小：{{ pkg.package.size | bytesToSize }}
+      button.pkg__mobile-ios-btn(
+        v-if="global.isIos"
+        @click="install"
+      ) 安装
       a.pkg__mobile-btn-wrap(
+        v-else
         :href="_getAsset('bundle', pkg.app.platform, pkg.app.bundleID, pkg.version.version, pkg.package.id)"
       )
         button 下载
@@ -138,6 +143,16 @@ export default {
     box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.4), 0 -1px 1px 0 rgba(16, 22, 26, 0.2)
     color: white
 
+.pkg__mobile-ios-btn
+  display: block
+  margin-top: 40px
+  width: 100%
+  height: 40px
+  border-radius: 3px
+  background: rgba(19, 124, 189, 1)
+  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.4), 0 -1px 1px 0 rgba(16, 22, 26, 0.2)
+  color: white
+
 .pkg__box
   border: 1px solid rgba(16, 22, 26, 0.2)
   background: white
@@ -195,8 +210,6 @@ export default {
     width: 200px
     flex-shrink: 0
     flex-direction: column
-    height: 100%
-    align-self: flex-start
 
     img
       width: 128px
@@ -236,4 +249,7 @@ export default {
 
   .pkg__footer-text:first-child
     margin-right: 8px
+
+  .pkg__mobile-ios-btn
+    display: none
 </style>
