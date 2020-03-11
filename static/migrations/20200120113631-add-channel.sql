@@ -1,7 +1,7 @@
 
 -- +migrate Up
 alter table package
-  add column channel text not null default '-'，
+  add column channel text not null default '-',
 ;
 
 -- +migrate Down
