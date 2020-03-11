@@ -128,6 +128,7 @@ const PLATFORM = {
 export default {
   data() {
     return {
+      // 以下三个变量，null表示选择全部
       curEnv: null,
       curChannel: null,
       curVersion: null,
@@ -154,11 +155,20 @@ export default {
   },
 
   mounted() {
-    this.curEnv = this.$route.query.env || null
-    this.curChannel = this.$route.query.channel || null
-    this.curVersion = Number(this.$route.query.version) || null
-
     this.$store.dispatch("getAppInfo", this.$route.params.id)
+      .then(() => {
+        this.curEnv = this.$route.query.env || null
+        this.curChannel = this.$route.query.channel || null
+        const version = this.$route.query.version
+
+        // undefined: 表示没有设置过版本，默认选择最新的
+        // null: 表示选择全部
+        if(version === undefined) {
+          this.setVersion(this.app.versions[0].id)
+        } else {
+          this.curVersion = Number(version) || null
+        }
+      })
       .then(() => this.getApp())
   },
 
@@ -166,7 +176,7 @@ export default {
     getApp() {
       const params = {}
       if(this.curEnv != null) {
-        params.env = this.env
+        params.env = this.curEnv
       }
       if(this.curChannel != null) {
         params.channel = this.curChannel
@@ -218,7 +228,6 @@ export default {
           env,
         },
       })
-      this.getApp()
     },
 
     setChannel(channel) {
@@ -230,7 +239,6 @@ export default {
           channel,
         },
       })
-      this.getApp()
     },
 
     setVersion(version) {
@@ -242,7 +250,6 @@ export default {
           version,
         },
       })
-      this.getApp()
     },
   },
 }
