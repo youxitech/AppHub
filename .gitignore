@@ -3,3 +3,4 @@ tmp
 static/ui
 node_modules
 bindata.go
+.idea

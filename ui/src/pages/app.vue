@@ -84,7 +84,7 @@
             .app__qrcode-wrap(ref="popper")
               img.app__qrcode(
                 v-if="item.qrcode != null"
-                :src="item.qrcode"
+                src="/static/qrcode.svg"
               )
             div(
               v-show="false"
@@ -95,7 +95,7 @@
             a.app__download-wrap(
               :href="_getAsset('bundle', app.app.platform, app.app.bundleID, item.version, item.id)"
             )
-              img.app__download(src="/static/download.svg")
+              img.app__download(src="/static/download-v1.svg")
 
     .app__right
       .app__version(
@@ -394,9 +394,9 @@ export default {
   align-self: center
 
 .app__download
-  margin: 6px
-  width: 20px
-  height: 20px
+  margin: 2px
+  width: 26px
+  height: 26px
 
 .app__round
   position: absolute
