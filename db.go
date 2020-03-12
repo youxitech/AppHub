@@ -315,7 +315,7 @@ func (db *DB) getVersionByAppAliasAndFullVersion(appAlias, fullVersion string) *
 	return ver
 }
 
-// -1/"" means all
+// -1 or empty string means all
 func (db *DB) getPackages(
 	appAlias string,
 	versionID int,
@@ -355,6 +355,8 @@ func (db *DB) getPackages(
 		params = append(params, channel)
 		n += 1
 	}
+
+	sql += ` order by v.sort_key desc, p.created_at desc`
 
 	if err := db.Select(&pkgs, sql, params...); err != nil {
 		return nil, err
