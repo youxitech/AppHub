@@ -69,17 +69,20 @@ export default {
       uppy
         .on("file-added", file => {
           let channel = ""
+          let env = ""
           const { name } = file
           const nameArr = name.split(".")
           nameArr.splice(nameArr.length - 1, 1)
           const fileName = nameArr.join(".")
           const fileNameArr = fileName.split("-")
-          if(fileNameArr.length === 3 && fileNameArr[1] === "prod") {
+          if(fileNameArr.length === 3) {
             channel = fileNameArr[2]
+            env = fileNameArr[1]
           }
 
           uppy.setFileMeta(file.id, {
             channel,
+            env,
           })
         })
         .use(Dashboard, { trigger: ".uploader-trigger" })
@@ -87,7 +90,7 @@ export default {
           endpoint: "/api/admin/upload",
           formData: true,
           fieldName: "file",
-          metaFields: ["channel"],
+          metaFields: ["channel", "env"],
           headers: {
             "X-Admin-Token": _db.token,
           },
